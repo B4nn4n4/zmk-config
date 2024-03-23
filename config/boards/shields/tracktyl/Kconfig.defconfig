@@ -1,24 +1,25 @@
-if Tracktyl_LEFT
+if 	Tracktyl_DONGLE
 
 config ZMK_KEYBOARD_NAME
     default "Tracktyl"
-
+    
 config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config ZMK_USB
     default y
 
 endif
 
-if Tracktyl_RIGHT
-config ZMK_KEYBOARD_NAME
-  default "Tracktyl-slave"
-
-endif
-
-if Tracktyl_LEFT || Tracktyl_RIGHT
+if Tracktyl_LEFT || Tracktyl_RIGHT || Tracktyl_DONGLE
 
 config ZMK_SPLIT
     default y
 
 config ZMK_SLEEP
 	default y
+	
+config ZMK_BLE
+    default y
+	
 endif

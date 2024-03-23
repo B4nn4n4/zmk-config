@@ -3,3 +3,6 @@ config Tracktyl_LEFT
 
 config Tracktyl_RIGHT
     def_bool $(shields_list_contains,tracktyl_right)
+	
+config Tracktyl_DONGLE
+    def_bool $(shields_list_contains,tracktyl_dongle)
