@@ -1,7 +1,7 @@
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/B4nn4n4
+      url-base: https://github.com/fliano
   projects:
     - name: zmk
       remote: zmkfirmware
