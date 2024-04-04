@@ -45,12 +45,11 @@
                         >;
 						trackball-bindings = <&tsl>;
                 };
-
                 raise_layer {
                         bindings = <
-						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        &none       	&none      	&kp K_SLEEP
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL    &kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&bt BT_SEL 0 &bt BT_SEL 1	&none 		&none
+						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none       	&none      	&none
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL    	&kp RGUI   	&kp RALT	&kp RSHIFT	 
+						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&none			&none	&none 		&none
 																							&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
@@ -58,13 +57,12 @@
 				
 				tb_layer {
                         bindings = <
-						   &kp F6 			&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
-						   &kp TAB      		&kp LEFT   		&mkp LCLK	&mkp RCLK 		&kp MINUS   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&bt BT_SEL 0 &bt BT_SEL 1	&none 		&none
+						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
+						   &kp none      		&none   		&mkp LCLK	&mkp RCLK 		&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
+						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&none			&none		&none 		&none
 																							&kp SPACE     				&none		 	&none
 						>;
-						trackball-bindings = <&tkp BSPC DELETE LC(MINUS) LC(PLUS)>;
+						trackball-bindings = <&tkp LEFT RIGHT UP DOWN>;
                 };
         };
 };
-
