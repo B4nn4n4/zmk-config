@@ -23,6 +23,17 @@
 			};
 		};
 
+		behaviors {
+			bmm: balanced_mouse_mods {
+				compatible = "zmk,behavior-hold-tap";
+				label = "HOMEROW_MODS";
+				#binding-cells = <2>;
+				tapping-term-ms = <200>;    // <---[[moderate duration]]
+				quick-tap-ms = <0>;
+				flavor = "balanced";
+				bindings = <&kp>, <&mkp>;
+			};
+		};
 
         keymap {
                 compatible = "zmk,keymap";
@@ -38,7 +49,7 @@
                 };
                 lower_layer {
                         bindings = <
-							&none			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT			&kp MINUS 		&kp EQUAL
+							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
 							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm RCTRL N1 	&bhm RGUI N3   	&bhm RALT N5	&bhm RSHIFT N7
 							&kp BSLH        &none  			&none    		&none      		&none        				&none	 		&none			&none       	&kp LBRC 		&kp RBRC
 																							&none      					&kp BSPC		&none
@@ -47,10 +58,10 @@
                 };
                 raise_layer {
                         bindings = <
-						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none       	&none      	&none
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL    	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&none			&none	&none 		&none
-																							&kp SPACE     				&none		 	&none
+						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        		&mkkp MCLK      &none      	&kp DEL
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLKK	&bmm RGUI RCLK  &kp RALT	&kp RSHIFT	 
+						   &none	 			&none 	 		&none  		&none 			&none           			&none		 	&none				&kp K_CMEN		&none 		&none
+				 																			&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
                 };
@@ -59,7 +70,7 @@
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
 						   &none      			&mkp MCLK   	&mkp LCLK	&mkp RCLK 		&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&none 	 		&none  		&none			&none           			&none		 	&none			&none		&none 		&none
+						   &none	 			&none 	 		&none  		&kp K_CMEN		&none           			&none		 	&none			&none		&none 		&none
 																							&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
