@@ -20,10 +20,8 @@
 				quick-tap-ms = <0>;
 				flavor = "balanced";
 				bindings = <&kp>, <&kp>;
-			};
-		};
-
-		behaviors {
+			}; 
+			
 			bmm: balanced_mouse_mods {
 				compatible = "zmk,behavior-hold-tap";
 				label = "HOMEROW_MODS";
