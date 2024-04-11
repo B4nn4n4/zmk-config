@@ -59,7 +59,7 @@
                 raise_layer {
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&mkp MCLK      	&none      	&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLK	&bmm RGUI RCLK  &kp RALT	&kp RSHIFT
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL	&bmm RGUI RCLK  &kp RALT	&kp RSHIFT
 						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&kp C_CMEN		&none 		&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
