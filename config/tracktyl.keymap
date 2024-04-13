@@ -24,7 +24,7 @@
 			
 			bmm: balanced_mouse_mods {
 				compatible = "zmk,behavior-hold-tap";
-				label = "M_MODS";
+				label = "MOUSE_MODS";
 				#binding-cells = <2>;
 				tapping-term-ms = <200>;    // <---[[moderate duration]]
 				quick-tap-ms = <0>;
@@ -58,7 +58,7 @@
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&mkp MCLK      	&none      	&kp DEL
 						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLK	&bmm RGUI RCLK  &kp RALT	&kp RSHIFT
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&kp C_MENU		&none 		&none
+						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&kp K_CMENU		&none 		&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
@@ -67,9 +67,19 @@
 				tb_layer {
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
-						   &none      			&mkp MCLK   	&mkp LCLK	&mkp RCLK 		&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&none 	 		&none  		&kp C_MENU		&none           			&none		 	&none			&none		&none 		&none
+						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
+						   &none	 			&tog 4 	 		&none  		&none			&none           			&none		 	&none			&none		&none 		&none
 																							&kp SPACE     				&none		 	&none
+						>;
+						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
+                };
+				
+				shoter_layer {
+                        bindings = <
+						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&mkp MCLK		&none 		&tog 0
+						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&none		&none
+						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
+																					&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
                 };
