@@ -56,9 +56,9 @@
                 };
                 raise_layer {
                         bindings = <
-						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&mkp MCLK      	&none      	&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLK	&bmm RGUI RCLK  &kp RALT	&kp RSHIFT
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&kp K_CMENU		&none 		&none
+						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLK	&bmm RGUI RCLK  &bmm RALT MCLK	&bhm RSHIFT K_CMENU 
+						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&mkp LCLK		&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
@@ -68,20 +68,32 @@
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
 						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none  		&none			&none           			&none		 	&none			&none		&none 		&none
+						   &none	 			&tog 4 	 		&none  		&none			&none           			&none		 	&none			&none		&tog 5 		&none
 																							&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
                 };
 				
+				fusion_layer {
+                        bindings = <
+							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&kp SEMI
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&bhm RSHIFT O  
+							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+                        >;
+						trackball-bindings = <&tmv>;
+                };
+				
+				
+				
 				shoter_layer {
                         bindings = <
-						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&mkp MCLK		&none 		&tog 0
+						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&mkp MCLK		&none 		&tog 4
 						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&none		&none
 						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
-																					&kp SPACE     				&none		 	&none
+																					&lt 1 SPACE     			&none		 	&none
 						>;
-						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
+						trackball-bindings = <&tmv>;
                 };
         };
 };
