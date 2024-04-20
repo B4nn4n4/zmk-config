@@ -68,7 +68,7 @@
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
 						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none		&bootloader		&none           			&none		 	&bootloader		&none	&tog 5 		&none
+						   &none	 			&tog 4 	 		&none		&bootloader		&none           			&none		 	&bootloader		&none		&tog 5 		&none
 																							&kp SPACE     				&none			&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
@@ -77,7 +77,7 @@
 				fusion_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp LC(MCLK)  
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
 							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
