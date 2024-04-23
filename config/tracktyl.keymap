@@ -44,27 +44,6 @@
 			compatible = "zmk,combos";
 			combo_leftclick {
 				timeout-ms = <50>;
-				key-positions = <16 17>;
-				bindings = <&mkp RCLK>;
-			};
-			
-			compatible = "zmk,combos";
-			combo_rightclick {
-				timeout-ms = <50>;
-				key-positions = <17 18>;
-				bindings = <&mkp LCLK>;
-			};
-			
-			compatible = "zmk,combos";
-			combo_leftclick {
-				timeout-ms = <50>;
-				key-positions = <16 18>;
-				bindings = <&mkp MCLK>;
-			};
-			
-			compatible = "zmk,combos";
-			combo_leftclick {
-				timeout-ms = <50>;
 				key-positions = <11 12>;
 				bindings = <&mkp RCLK>;
 			};
@@ -77,11 +56,12 @@
 			};
 			
 			compatible = "zmk,combos";
-			combo_leftclick {
+			combo_middleclick {
 				timeout-ms = <50>;
 				key-positions = <11 13>;
 				bindings = <&mkp MCLK>;
 			};
+			
 			
 			
 		};
@@ -112,8 +92,8 @@
                 raise_layer {
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&bmm RCTRL LCLK	&bmm RGUI RCLK  &bmm RALT MCLK	&bhm RSHIFT K_CMENU 
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&mkp LCLK		&none			&none 			&none
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RCLK  		&kp MCLK		&kp K_CMENU 
+						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
