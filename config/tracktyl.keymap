@@ -44,7 +44,7 @@
 			compatible = "zmk,combos";
 			combo_click {
 				timeout-ms = <50>;
-				key-positions = <17 18>;
+				key-positions = <6 7>;
 				bindings = <&mkp LCLK>;
 			};
 			
