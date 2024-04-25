@@ -32,7 +32,7 @@
 				bindings = <&kp>, <&mkp>;
 			};
 			 
-			//mosc: mouse_scrole {
+			//mosc: mouse_scrollt {
 			//	compatible = "zmk,behavior-mod-morph";
 			//	#binding-cells = <0>;
 			//	bindings = <&tmv>, <&tsl>;
