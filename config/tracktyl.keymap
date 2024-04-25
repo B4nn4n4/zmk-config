@@ -31,6 +31,13 @@
 				flavor = "balanced";
 				bindings = <&kp>, <&mkp>;
 			};
+			 
+			mosc: mouse_scrole {
+				compatible = "zmk,behavior-mod-morph";
+				#binding-cells = <0>;
+				bindings = <&tmv>, <&tsl>;
+				mods = <(MOD_LSFT|MOD_RSFT)>;
+			};
 		};
 		
 		combos {
@@ -41,30 +48,33 @@
 				bindings = <&kp ESC>;
 			};
 			
-			compatible = "zmk,combos";
 			combo_leftclick {
 				timeout-ms = <50>;
 				key-positions = <11 12>;
 				bindings = <&mkp RCLK>;
 			};
 			
-			compatible = "zmk,combos";
 			combo_rightclick {
 				timeout-ms = <50>;
 				key-positions = <12 13>;
 				bindings = <&mkp LCLK>;
 			};
 			
-			compatible = "zmk,combos";
 			combo_middleclick {
 				timeout-ms = <50>;
 				key-positions = <11 13>;
 				bindings = <&mkp MCLK>;
 			};
 			
-			
+			combo_minus {
+				timeout-ms = <50>;
+				key-positions = <19 20>;
+				bindings = <&mkp MINUS>;
+			};
 			
 		};
+		
+		
 
         keymap {
                 compatible = "zmk,keymap";
@@ -92,7 +102,7 @@
                 raise_layer {
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RCLK  		&kp MCLK		&kp K_CMENU 
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT kp K_CMENU 
 						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
