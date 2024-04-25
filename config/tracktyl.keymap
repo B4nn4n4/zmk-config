@@ -68,7 +68,7 @@
 			
 			combo_minus {
 				timeout-ms = <50>;
-				key-positions = <19 20>;
+				key-positions = <18 19>;
 				bindings = <&mkp MINUS>;
 			};
 			
