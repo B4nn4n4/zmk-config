@@ -32,12 +32,12 @@
 				bindings = <&kp>, <&mkp>;
 			};
 			 
-			mosc: mouse_scrole {
-				compatible = "zmk,behavior-mod-morph";
-				#binding-cells = <0>;
-				bindings = <&tmv>, <&tsl>;
-				mods = <(MOD_LSFT|MOD_RSFT)>;
-			};
+			#mosc: mouse_scrole {
+			#	compatible = "zmk,behavior-mod-morph";
+			#	#binding-cells = <0>;
+			#	bindings = <&tmv>, <&tsl>;
+			#	mods = <(MOD_LSFT|MOD_RSFT)>;
+			#};
 		};
 		
 		combos {
