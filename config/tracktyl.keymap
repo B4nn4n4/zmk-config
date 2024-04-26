@@ -35,7 +35,7 @@
 			mosc: mouse_scrollt {
 				compatible = "zmk,behavior-mod-morph";
 				#binding-cells = <0>;
-				bindings = <&kp A>, <&tsl>;
+				bindings = <&kp A>, <&kp B>;
 				mods = <(MOD_LSFT|MOD_RSFT)>;
 			};
 		};
