@@ -50,7 +50,7 @@
 			combo_doublleftclick {
 				timeout-ms = <50>;
 				key-positions = <13 30>;
-				bindings = <&mkp RCLK &mkp RCLK>;
+				bindings = <&mkp LCLK &mkp LCLK>;
 			};
 			
 			combo_rightclick {
