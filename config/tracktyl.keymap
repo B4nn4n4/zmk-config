@@ -31,6 +31,13 @@
 				flavor = "balanced";
 				bindings = <&kp>, <&mkp>;
 			};
+			 
+			mosc: mouse_scrollt {
+				compatible = "zmk,behavior-mod-morph";
+				#binding-cells = <0>;
+				bindings = <&kp A>, <&kp B>;
+				mods = <(MOD_LSFT|MOD_RSFT)>;
+			};
 		};
 		
 		combos {
@@ -41,30 +48,50 @@
 				bindings = <&kp ESC>;
 			};
 			
-			compatible = "zmk,combos";
 			combo_leftclick {
 				timeout-ms = <50>;
 				key-positions = <11 12>;
 				bindings = <&mkp RCLK>;
 			};
 			
-			compatible = "zmk,combos";
+			combo_doublleftclick {
+				timeout-ms = <50>;
+				key-positions = <11 12 13>;
+				bindings = <&mkp RCLK &mkp RCLK>;
+			};
+			
 			combo_rightclick {
 				timeout-ms = <50>;
 				key-positions = <12 13>;
 				bindings = <&mkp LCLK>;
 			};
 			
-			compatible = "zmk,combos";
 			combo_middleclick {
 				timeout-ms = <50>;
 				key-positions = <11 13>;
 				bindings = <&mkp MCLK>;
 			};
 			
+			combo_minus {
+				timeout-ms = <50>;
+				key-positions = <18 19>;
+				bindings = <&mkp MINUS>;
+			};
 			
+			combo_BootLoaderL {
+				timeout-ms = <50>;
+				key-positions = <0 30>;
+				bindings = <&bootloader>;
+			};
 			
+			combo_RestetL {
+				timeout-ms = <50>;
+				key-positions = <9 31>;
+				bindings = <&sys_reset>;
+			};
 		};
+		
+		
 
         keymap {
                 compatible = "zmk,keymap";
@@ -92,7 +119,7 @@
                 raise_layer {
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RCLK  		&kp MCLK		&kp K_CMENU 
+						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
 						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
@@ -103,7 +130,7 @@
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
 						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none		&bootloader		&none           			&none		 	&bootloader		&none		&tog 5 		&none
+						   &none	 			&tog 4 	 		&none		&none			&none		           		&sys_reset		&bootloader		&none		&tog 5 		&none
 																							&kp SPACE     				&none			&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
