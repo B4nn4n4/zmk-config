@@ -115,9 +115,9 @@
 				
 				tb_layer {
                         bindings = <
-						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
-						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none		&none			&none		           		&none			&bootloader		&none		&tog 5 		&none
+						   &kp F6 				&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
+						   &bt BT_SEL 3      	&bt BT_SEL 2 	&bt BT_SEL 1	&bt BT_SEL 0 	&bt BT_CLR		   		    &none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
+						   &none	 			&tog 4 	 		&none			&none			&none		           		&none			&bootloader		&none		&tog 5 		&none
 																							&kp SPACE     				&none			&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
