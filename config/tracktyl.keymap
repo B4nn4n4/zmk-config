@@ -76,12 +76,6 @@
 				key-positions = <0 30>;
 				bindings = <&bootloader>;
 			};
-			
-			combo_RestetL {
-				timeout-ms = <50>;
-				key-positions = <9 31>;
-				bindings = <&sys_reset>;
-			};
 		};
 		
 		
