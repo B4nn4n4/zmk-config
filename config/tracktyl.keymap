@@ -135,7 +135,7 @@
 				
 				shoter_layer {
                         bindings = <
-						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&kp A 			&none 			&none			&none 		&tog 5
+						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&none			&none 		&tog 5
 						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&mkp MCLK	&none
 						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
 																					&lt 1 SPACE     			&none		 	&none
