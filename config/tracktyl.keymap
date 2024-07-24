@@ -85,9 +85,9 @@
 
                 default_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&bhm RCTRL N    &bhm RGUI E 	&bhm RALT I &bhm RSHIFT O  
-							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+							&kp Q 			&kp W 			&kp E   			&kp R       	&kp T    			&kp Z		&kp U       	&kp I    		&kp O   	&kp P
+							&bhm LSHIFT A 	&bhm LALT S 	&bhm LGUI D 		&bhm LCTRL F 	&kp G    			&kp H 		&bhm RCTRL J    &bhm RGUI K 	&bhm RALT L &bhm RSHIFT 
+							&kp Y 			&kp X 			&kp C 				&kp V     		&kp B    			&kp N 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
 						trackball-bindings = <&tmv>;
@@ -96,7 +96,7 @@
                 lower_layer {
                         bindings = <
 							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
-							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm RCTRL N1 	&bhm RGUI N3   	&bhm RALT N5	&bhm RSHIFT N7
+							&bhm LSHIFT N1	&bhm LALT N2    &bhm LGUI N3 	&bhm LCTRL N4  	&kp N5       				&kp N6      	&bhm RCTRL N7 	&bhm RGUI N8   	&bhm RALT N9	&bhm RSHIFT N0
 							&kp BSLH        &none  			&none    		&none      		&none        				&none	 		&none			&none       	&kp LBRC 		&kp RBRC
 																							&none      					&kp BSPC		&kp TILDE2
                         >;
