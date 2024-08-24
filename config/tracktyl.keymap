@@ -35,12 +35,7 @@
 		
 		combos {
 			compatible = "zmk,combos";
-			combo_esc {
-				timeout-ms = <50>;
-				key-positions = <0 1>;
-				bindings = <&kp ESC>;
-			};
-			
+
 			combo_leftclick {
 				timeout-ms = <50>;
 				key-positions = <11 12>;
@@ -64,31 +59,17 @@
 				key-positions = <11 13>;
 				bindings = <&mkp MCLK>;
 			};
-			
-			combo_minus {
-				timeout-ms = <50>;
-				key-positions = <18 19>;
-				bindings = <&mkp MINUS>;
-			};
-			
-			combo_BootLoaderL {
-				timeout-ms = <50>;
-				key-positions = <0 30>;
-				bindings = <&bootloader>;
-			};
 		};
 		
-		
-
         keymap {
                 compatible = "zmk,keymap";
 
                 default_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp E   			&kp R       	&kp T    			&kp Z		&kp U       	&kp I    		&kp O   	&kp P
-							&bhm LSHIFT A 	&bhm LALT S 	&bhm LGUI D 		&bhm LCTRL F 	&kp G    			&kp H 		&bhm RCTRL J    &bhm RGUI K 	&bhm RALT L &bhm RSHIFT MINUS
-							&kp Y 			&kp X 			&kp C 				&kp V     		&kp B    			&kp N 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+							&kp Q 			&kp W 			&kp E   		&kp R       	&kp T    					&kp Z			&kp U       	&kp I    		&kp O   		&kp P
+							&bhm LSHIFT A 	&bhm LALT S 	&bhm LGUI D 	&bhm LCTRL F 	&kp G    					&kp H 			&bhm RCTRL J    &bhm RGUI K 	&bhm RALT L 	&bhm RSHIFT MINUS
+							&kp Y 			&kp X 			&kp C 			&kp V     		&kp B    					&kp N 			&kp M       	&kp CMMA 		&kp DOT 		&kp FSLH
+																							&lt 1 SPACE    				&lt 2 BSPC  	&lt 3 ENTER
                         >;
 						trackball-bindings = <&tmv>;
                 };
@@ -98,16 +79,16 @@
 							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
 							&bhm LSHIFT N1	&bhm LALT N2    &bhm LGUI N3 	&bhm LCTRL N4  	&kp N5       				&kp N6      	&bhm RCTRL N7 	&bhm RGUI N8   	&bhm RALT N9	&bhm RSHIFT N0
 							&kp BSLH        &none  			&none    		&none      		&none        				&none	 		&none			&none       	&kp LBRC 		&kp RBRC
-																							&none      					&kp BSPC		&kp TILDE2
+																							&none      					&kp BSPC		&none
                         >;
 						trackball-bindings = <&tsl>;
                 };
 				
                 raise_layer {
                         bindings = <
-						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
+						   &kp ESC 			&kp HOME   		&kp UP   		&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
+						   &kp TAB      	&kp LEFT   		&kp DOWN		&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
+						   &none	 		&kp C_PREV 	 	&kp C_PP  		&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
 						trackball-bindings = <&tsl>;
@@ -115,32 +96,12 @@
 				
 				tb_layer {
                         bindings = <
-						   &kp F6 				&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
-						   &bt BT_SEL 3      	&bt BT_SEL 2 	&bt BT_SEL 1	&bt BT_SEL 0 	&bt BT_CLR		   		    &none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none			&none			&none		           		&none			&bootloader		&none		&tog 5 		&none
+						   &none	 		&none 	 		&none			&none			&none		           		&none			&none			&none		&none 		&none
+						   &kp F1 			&kp F2 			&kp F3 			&kp F4 			&kp F5     					&kp F6 			&kp F7 			&kp  F8		&kp F9 		&kp F10
+						   &none	 		&none 	 		&none			&none			&none		           		&none			&none			&none		&none 		&none
 																							&kp SPACE     				&none			&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
-                };
-				
-				fusion_layer {
-                        bindings = <
-							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
-							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
-                        >;
-						trackball-bindings = <&tmv>;
-                };
-				
-				shoter_layer {
-                        bindings = <
-						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&none			&none 		&tog 5
-						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&mkp MCLK	&none
-						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
-																					&lt 1 SPACE     			&none		 	&none
-						>;
-						trackball-bindings = <&tmv>;
                 };
         };
 };
