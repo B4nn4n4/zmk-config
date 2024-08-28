@@ -51,47 +51,47 @@
 			};
 		};
 		
-        keymap {
-                compatible = "zmk,keymap";
+		keymap {
+				compatible = "zmk,keymap";
 
-                default_layer {
-                        bindings = <
-							&kp Q 			&kp W 			&kp E   		&kp R       	&kp T    					&kp Z			&kp U       	&kp I    		&kp O   		&kp P
-							&bhm LSHIFT A 	&bhm LALT S 	&bhm LGUI D 	&bhm LCTRL F 	&kp G    					&kp H 			&bhm RCTRL J    &bhm RGUI K 	&bhm RALT L 	&bhm RSHIFT MINUS
-							&kp Y 			&kp X 			&kp C 			&kp V     		&kp B    					&kp N 			&kp M       	&kp CMMA 		&kp DOT 		&kp FSLH
-																							&lt 1 SPACE    				&lt 2 BSPC  	&lt 3 ENTER
-                        >;
+				default_layer {
+						bindings = <
+							&kp Q			&kp W			&kp E			&kp R			&kp T						&kp Z			&kp U			&kp I			&kp O			&kp P
+							&bhm LSHIFT A	&bhm LALT S		&bhm LGUI D 	&bhm LCTRL F	&kp G						&kp H			&bhm RCTRL J	&bhm RGUI K		&bhm RALT L		&bhm RSHIFT MINUS
+							&kp Y			&kp X			&kp C			&kp V			&kp B						&kp N			&kp M			&kp CMMA 		&kp DOT 		&kp FSLH
+																							&lt 1 SPACE					&lt 2 BSPC		&kp ENTER
+						>;
 						trackball-bindings = <&tmv>;
-                };
+				};
 				
-                lower_layer {
-                        bindings = <
-							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
-							&bhm LSHIFT N1	&bhm LALT N2    &bhm LGUI N3 	&bhm LCTRL N4  	&kp N5       				&kp N6      	&bhm RCTRL N7 	&bhm RGUI N8   	&bhm RALT N9	&bhm RSHIFT N0
-							&kp BSLH        &none  			&none    		&none      		&none        				&none	 		&none			&none       	&kp LBRC 		&kp RBRC
-																							&none      					&kp BSPC		&none
-                        >;
-						trackball-bindings = <&tsl>;
-                };
-				
-                raise_layer {
-                        bindings = <
-						   &kp ESC 			&kp HOME   		&kp UP   		&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      	&kp LEFT   		&kp DOWN		&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
-						   &none	 		&kp C_PREV 	 	&kp C_PP  		&kp C_NEXT		&none           			&none		 	&none			&none			&none 			&none
-				 																			&kp SPACE     				&none		 	&none
+				lower_layer {
+						bindings = <
+							&kp F1			&kp F2			&kp F3 			&kp F4			&kp F5						&kp F6			&kp F7			&kp  F8			&kp F9			&kp F10
+							&bhm LSHIFT N1	&bhm LALT N2	&bhm LGUI N3	&bhm LCTRL N4	&kp N5						&kp N6			&bhm RCTRL N7	&bhm RGUI N8	&bhm RALT N9	&bhm RSHIFT N0
+							&kp BSLH		&kp SQT			&none			&none			&kp F11						&kp F12			&kp LBKT		&kp RBKT		&kp MINUS		&kp EQUAL
+																							&none						&kp BSPC		&kp ENTER
 						>;
 						trackball-bindings = <&tsl>;
-                };
+				};
+				
+				raise_layer {
+						bindings = <
+							&kp ESC			&kp HOME		&kp UP 			&kp END			&none						&none			&none			&none			&none			&kp DEL
+							&kp TAB			&kp LEFT		&kp DOWN		&kp RIGHT		&none						&none			&kp RCTRL		&kp RGUI		&kp RALT		&bhm RSHIFT K_CMENU 
+							&none			&kp C_PREV		&kp C_PP		&kp C_NEXT		&none						&none			&none			&none			&none			&none
+				 																			&kp SPACE					&none			&none
+						>;
+						trackball-bindings = <&tsl>;
+				};
 				
 				tb_layer {
-                        bindings = <
-						   &none	 		&none 	 		&none			&none			&none		           		&none			&none			&none		&none 		&none
-						   &kp F1 			&kp F2 			&kp F3 			&kp F4 			&kp F5     					&kp F6 			&kp F7 			&kp  F8		&kp F9 		&kp F10
-						   &none	 		&none 	 		&none			&none			&none		           		&none			&none			&none		&none 		&none
-																							&kp SPACE     				&none			&none
+						bindings = <
+							&none			&none			&none			&none			&none						&none			&none			&none			&none			&none
+							&none			&none			&none			&none			&none						&none			&none			&none			&none			&none
+							&none			&none			&none			&none			&none						&none			&none			&none			&none			&none
+																							&none						&none			&none
 						>;
 						trackball-bindings = <&tkp RIGHT LEFT DOWN UP>;
-                };
-        };
+				};
+		};
 };
