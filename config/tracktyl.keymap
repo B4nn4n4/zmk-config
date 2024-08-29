@@ -91,7 +91,7 @@
                         bindings = <
 						    &kp F6 			&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1			&kp F3			&kp F5			&kp F7
 							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm LCTRL N1 	&bhm LGUI N3   	&bhm LALT N5	&bhm LSHIFT N7
-							&kp BSLH        &kp SQT  		&none    		&none      		&kp F12        				&kp F12	 		&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
+							&kp BSLH        &kp SQT  		&none    		&none      		&kp F11        				&kp F12	 		&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
 																							&none      					&kp BSPC		&kp ENTER
                         >;
 						trackball-bindings = <&tsl>;
