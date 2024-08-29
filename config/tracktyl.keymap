@@ -62,7 +62,7 @@
 			combo_middleclick {
 				timeout-ms = <50>;
 				key-positions = <11 13>;
-				bindings = <&bmm 2 MCLK>;
+				bindings = <&blm 2 MCLK>;
 			};
 
 			combo_bootloader {
