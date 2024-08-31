@@ -37,7 +37,7 @@
 				label = "TapDanceL";
 				#binding-cells = <0>;
 				tapping-term-ms = <400>;
-				bindings = <&bhm LCRL T>, <&mkp LCLK>;
+				bindings = <&bhm LCTRL T>, <&mkp LCLK>;
 			};
 
 			tdrc: tap_dance_rightclick {
@@ -91,7 +91,7 @@
 		&mmv {
 			time-to-max-speed-ms = <400>;             /* <--- How long time until max speed is reached (default: 500) */
 		};
-		
+
         keymap {
                 compatible = "zmk,keymap";
 
