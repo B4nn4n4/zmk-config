@@ -37,7 +37,6 @@
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
 				bindings = <&kp T>, <&mkp LCLK>;
-				
 			};
 
 			tdrc: tap_dance_rightclick {
@@ -45,7 +44,6 @@
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
 				bindings = <&kp S>, <&mkp RCLK>;
-				};
 			};
 		};
 		
