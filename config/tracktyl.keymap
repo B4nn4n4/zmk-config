@@ -37,7 +37,7 @@
 				label = "TapDanceL";
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
-				bindings = <&kp T>, <&mkp LCLK>;
+				bindings = <&bhm LGUI T>, <&mkp LCLK>;
 			};
 
 			tdrc: tap_dance_rightclick {
@@ -94,7 +94,7 @@
                 default_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    					&kp J			&kp L       	&kp U    		&kp Y   		&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI tdrc 	&bhm LCTRL tdlc &kp D    					&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I 	&bhm LSHIFT O  
+							&bhm LSHIFT A 	&bhm LALT R 	&tdrc			&bhm LCTRL tdlc &kp D    					&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I 	&bhm LSHIFT O  
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    					&kp K 			&kp M       	&kp CMMA 		&kp DOT 		&kp FSLH
 																							&lt 1 SPACE    				&lt 2 BSPC  	&lt 3 ENTER
                         >;
