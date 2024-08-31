@@ -34,16 +34,18 @@
 
 			tdlc: tap_dance_leftclick {
 				compatible = "zmk,behavior-tap-dance";
+				label = "TapDanceL";
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
-				bindings = <&kp T>, <&kp S>;
+				bindings = <&kp T>, <&mkp LCLK>;
 			};
 
 			tdrc: tap_dance_rightclick {
 				compatible = "zmk,behavior-tap-dance";
+				label = "TapDanceR";
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
-				bindings = <&kp S>, <&kp T>;
+				bindings = <&kp S>, <&mkp RCLK>;
 			};
 		};
 		
