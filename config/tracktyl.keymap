@@ -30,6 +30,21 @@
 				quick-tap-ms = <0>;
 				flavor = "balanced";
 				bindings = <&mo>, <&mkp>;
+
+			tdlc: tap_dance_leftclick {
+				compatible = "zmk,behavior-tap-dance";
+				#binding-cells = <0>;
+				tapping-term-ms = <200>;
+				bindings = <&kp T>, <&mkp LCLK>;
+				};
+			};
+
+			tdrc: tap_dance_rightclick {
+				compatible = "zmk,behavior-tap-dance";
+				#binding-cells = <0>;
+				tapping-term-ms = <200>;
+				bindings = <&kp S>, <&mkp RCLK>;
+				};
 			};
 		};
 		
@@ -72,8 +87,6 @@
 			};
 		};
 		
-		
-
         keymap {
                 compatible = "zmk,keymap";
 
