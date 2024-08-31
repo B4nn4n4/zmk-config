@@ -36,7 +36,7 @@
 				compatible = "zmk,behavior-tap-dance";
 				label = "TapDanceL";
 				#binding-cells = <0>;
-				tapping-term-ms = <200>;
+				tapping-term-ms = <400>;
 				bindings = <&bhm LGUI T>, <&mkp LCLK>;
 			};
 
@@ -44,8 +44,8 @@
 				compatible = "zmk,behavior-tap-dance";
 				label = "TapDanceR";
 				#binding-cells = <0>;
-				tapping-term-ms = <200>;
-				bindings = <&bhm LGUI S>, <&mkp RCLK>;
+				tapping-term-ms = <400>;
+				bindings = <&bhm LCTR S>, <&mkp RCLK>;
 			};
 		};
 		
