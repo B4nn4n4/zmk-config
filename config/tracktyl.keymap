@@ -37,7 +37,7 @@
 				label = "TapDanceL";
 				#binding-cells = <0>;
 				tapping-term-ms = <400>;
-				bindings = <&bhm LGUI T>, <&mkp LCLK>;
+				bindings = <&bhm LCRL T>, <&mkp LCLK>;
 			};
 
 			tdrc: tap_dance_rightclick {
@@ -45,7 +45,7 @@
 				label = "TapDanceR";
 				#binding-cells = <0>;
 				tapping-term-ms = <400>;
-				bindings = <&bhm LCTR S>, <&mkp RCLK>;
+				bindings = <&bhm LGUI S>, <&mkp RCLK>;
 			};
 		};
 		
@@ -86,6 +86,10 @@
 				key-positions = <0 30>;
 				bindings = <&bootloader	>;
 			};
+		};
+
+		&mmv {
+			time-to-max-speed-ms = <400>;             /* <--- How long time until max speed is reached (default: 500) */
 		};
 		
         keymap {
