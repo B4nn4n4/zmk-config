@@ -71,27 +71,21 @@ time-to-max-speed-ms = <500>;                 /* <--- How long time until max sp
 				bindings = <&kp TILDE2>;
 			};
 			
-			combo_leftclick {
+/*			combo_leftclick {
 				timeout-ms = <50>;
 				key-positions = <11 12>;
 				bindings = <&mkp RCLK>;
-			};
-			
-			combo_doublleftclick {
-				timeout-ms = <50>;
-				key-positions = <13 30>;
-				bindings = <&mkp LCLK &mkp LCLK>;
 			};
 			
 			combo_rightclick {
 				timeout-ms = <50>;
 				key-positions = <12 13>;
 				bindings = <&mkp LCLK>;
-			};
+			};*/
 			
 			combo_middleclick {
 				timeout-ms = <50>;
-				key-positions = <11 13>;
+				key-positions = <12 13>;
 				bindings = <&blm 2 MCLK>;
 			};
 
