@@ -36,14 +36,14 @@
 				compatible = "zmk,behavior-tap-dance";
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
-				bindings = <&kp T>, <&mkp LCLK>;
+				bindings = <&kp T>, <&kp S>;
 			};
 
 			tdrc: tap_dance_rightclick {
 				compatible = "zmk,behavior-tap-dance";
 				#binding-cells = <0>;
 				tapping-term-ms = <200>;
-				bindings = <&kp S>, <&mkp RCLK>;
+				bindings = <&kp S>, <&kp T>;
 			};
 		};
 		
