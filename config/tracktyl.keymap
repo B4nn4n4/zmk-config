@@ -46,21 +46,21 @@ time-to-max-speed-ms = <500>;                 /* <--- How long time until max sp
 				bindings = <&mo>, <&mkp>;
 			};
 
-			tdlc: tap_dance_leftclick {
-				compatible = "zmk,behavior-tap-dance";
-				label = "TapDanceL";
-				#binding-cells = <0>;
-				tapping-term-ms = <400>;
-				bindings = <&bhm LCTRL T>, <&mkp LCLK>;
-			};
+			// tdlc: tap_dance_leftclick {
+			// 	compatible = "zmk,behavior-tap-dance";
+			// 	label = "TapDanceL";
+			// 	#binding-cells = <0>;
+			// 	tapping-term-ms = <400>;
+			// 	bindings = <&bhm LCTRL T>, <&mkp LCLK>;
+			// };
 
-			tdrc: tap_dance_rightclick {
-				compatible = "zmk,behavior-tap-dance";
-				label = "TapDanceR";
-				#binding-cells = <0>;
-				tapping-term-ms = <400>;
-				bindings = <&bhm LGUI S>, <&mkp RCLK>;
-			};
+			// tdrc: tap_dance_rightclick {
+			// 	compatible = "zmk,behavior-tap-dance";
+			// 	label = "TapDanceR";
+			// 	#binding-cells = <0>;
+			// 	tapping-term-ms = <400>;
+			// 	bindings = <&bhm LGUI S>, <&mkp RCLK>;
+			// };
 		};
 		
 		combos {
@@ -71,7 +71,7 @@ time-to-max-speed-ms = <500>;                 /* <--- How long time until max sp
 				bindings = <&kp TILDE2>;
 			};
 			
-/*			combo_leftclick {
+			combo_leftclick {
 				timeout-ms = <50>;
 				key-positions = <11 12>;
 				bindings = <&mkp RCLK>;
@@ -81,11 +81,11 @@ time-to-max-speed-ms = <500>;                 /* <--- How long time until max sp
 				timeout-ms = <50>;
 				key-positions = <12 13>;
 				bindings = <&mkp LCLK>;
-			};*/
+			};
 			
 			combo_middleclick {
 				timeout-ms = <50>;
-				key-positions = <12 13>;
+				key-positions = <11 13>;
 				bindings = <&blm 2 MCLK>;
 			};
 
@@ -102,7 +102,7 @@ time-to-max-speed-ms = <500>;                 /* <--- How long time until max sp
                 default_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    					&kp J			&kp L       	&kp U    		&kp Y   		&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&tdrc			&tdlc 			&kp D    					&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I 	&bhm LSHIFT O  
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S		&bhm LCTRL T	&kp D    					&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I 	&bhm LSHIFT O  
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    					&kp K 			&kp M       	&kp CMMA 		&kp DOT 		&kp FSLH
 																							&lt 1 SPACE    				&lt 2 BSPC  	&lt 3 ENTER
                         >;
