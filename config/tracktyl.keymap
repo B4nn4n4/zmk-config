@@ -17,7 +17,6 @@
 		behaviors {
 			bhm: balanced_homerow_mods {
 				compatible = "zmk,behavior-hold-tap";
-				label = "HOMEROW_MODS";
 				#binding-cells = <2>;
 				tapping-term-ms = <200>;    // <---[[moderate duration]]
 				quick-tap-ms = <0>;
@@ -114,7 +113,6 @@
             input-processors = <&zip_xy_scaler 1 1>, <&zip_temp_layer 0 1000>;
 
             scroll {
-                inherit;
                 layers = <0>;
                 input-processors = <&zip_xy_scaler 1 50>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
