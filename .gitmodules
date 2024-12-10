@@ -1,0 +1,6 @@
+[submodule "pmw3610"]
+	path = pmw3610
+	url = https://github.com/kaievns/zmk-pmw3610-driver.git
+[submodule "drivers/pmw3610"]
+	path = drivers/pmw3610
+	url = https://github.com/kaievns/zmk-pmw3610-driver.git
