@@ -12,6 +12,7 @@
 #include <dt-bindings/zmk/input_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
+
 / { 
 		behaviors {
 			bhm: balanced_homerow_mods {
@@ -85,13 +86,14 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 6>,<&zip_temp_layer MOUSE 1000>;
+            input-processors = <&zip_xy_scaler 1 6>,<&zip_temp_layer 0 1000>;
 
             scroll {
-                layers = <SCROLL>;
+                layers = <3>;
                 input-processors = <&zip_xy_scaler 1 30>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
+		
         behaviors {
             // keys to a fake mouse input device
             mm: mouse_move {
@@ -109,11 +111,11 @@
         mmv_input_listener {
             compatible = "zmk,input-listener";
             device = <&mm>;
-            input-processors = <&zip_xy_scaler 1 1>, <&zip_temp_layer MOUSE 1000>;
+            input-processors = <&zip_xy_scaler 1 1>, <&zip_temp_layer 0 1000>;
 
             scroll {
                 inherit;
-                layers = <MOUSE>;
+                layers = <0>;
                 input-processors = <&zip_xy_scaler 1 50>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
