@@ -1,9 +1,6 @@
 // tracktyl_right.overlay
 
 #include "tracktyl.dtsi"
-#include <input/processors.dtsi>
-#include <dt-bindings/zmk/input_transform.h>
-#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 &default_transform { // The matrix transform for this board is 6 columns over because the left half is 6 columns wide according to the matrix.
     col-offset = <5>;
