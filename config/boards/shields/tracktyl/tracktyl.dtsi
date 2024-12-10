@@ -31,8 +31,7 @@
 			;
 
     };
-};
-
+	
 trackball_spi: &spi1 {
     status = "okay";
     compatible = "nordic,nrf-spim";
@@ -52,4 +51,6 @@ trackball_spi: &spi1 {
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
     };
+
+
 };
