@@ -77,6 +77,24 @@
 				key-positions = <18 19>;
 				bindings = <&mkp MINUS>;
 			};
+
+			combo_bootload {
+				timeout-ms = <50>;
+				key-positions = <0 30>;
+				bindings = <&bootloader>;
+			};
+
+			combo_bootload {
+				timeout-ms = <50>;
+				key-positions = <0 30>;
+				bindings = <&bootloader>;
+			};
+
+			combo_sysreset {
+				timeout-ms = <50>;
+				key-positions = <0 24>;
+				bindings = <&sys_reset>;
+			};
 			
 		};
 
@@ -98,7 +116,7 @@
                 acceleration-exponent = <1>;
             };
         };
-        // mapping the fake keys to mouse device tack to the layers
+
         // mapping the fake keys to mouse device tack to the layers
         mmv_input_listener {
             compatible = "zmk,input-listener";
@@ -113,7 +131,7 @@
 		
 
         keymap {
-                compatible = "zmk,keymap";//
+                compatible = "zmk,keymap";
 
                 default_layer {
                         bindings = <
@@ -128,7 +146,7 @@
                         bindings = <
 							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
 							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm RCTRL N1 	&bhm RGUI N3   	&bhm RALT N5	&bhm RSHIFT N7
-							&kp BSLH        &none  			&none    		&bootloader		&sys_reset        				&none	 		&none			&none       	&none 		&none
+							&kp BSLH        &none  			&none    		&none			&none        				&none	 		&none			&none       	&none 		&none
 																							&none      					&kp BSPC		&kp TILDE2
                         >;
                 };
@@ -146,7 +164,7 @@
                         bindings = <
 						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
 						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none		&bootloader		&sys_reset           		&sys_reset		&bootloader		&none		&tog 5 		&none
+						   &none	 			&tog 4 	 		&none		&none			&none           		&sys_reset		&bootloader		&none		&tog 5 		&none
 																							&kp SPACE     				&none			&none
 						>;
                 };
