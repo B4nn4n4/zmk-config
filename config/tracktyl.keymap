@@ -84,12 +84,6 @@
 				bindings = <&bootloader>;
 			};
 
-			combo_bootload {
-				timeout-ms = <50>;
-				key-positions = <0 30>;
-				bindings = <&bootloader>;
-			};
-
 			combo_sysreset {
 				timeout-ms = <50>;
 				key-positions = <0 24>;
