@@ -1,6 +1,10 @@
 // tracktyl_left.overlay
 
 #include "tracktyl.dtsi" // Notice that the main dtsi files are included in the overlay.
+#include <input/processors.dtsi>
+#include <dt-bindings/zmk/input_transform.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
 
 &kscan0 {
     col-gpios
