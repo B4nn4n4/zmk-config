@@ -129,7 +129,7 @@
 
                 default_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&sys_reset		&bootloader       	&kp U    		&kp Y   	&kp SEMI
+							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
 							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&bhm RCTRL N    &bhm RGUI E 	&bhm RALT I &bhm RSHIFT O  
 							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
