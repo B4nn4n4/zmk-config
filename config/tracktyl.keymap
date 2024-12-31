@@ -118,7 +118,7 @@
             input-processors = <&zip_xy_scaler 1 1>, <&zip_temp_layer 0 1000>;
 
             scroll {
-                layers = <0>;
+                layers = <1>;
                 input-processors = <&zip_xy_scaler 1 50>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
@@ -138,9 +138,9 @@
 				
                 lower_layer {
                         bindings = <
-							&kp SQT			&none			&none			&none			&none						&none 			&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
+							&kp F6 			&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3			&kp F5 			&kp F7
 							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm RCTRL N1 	&bhm RGUI N3   	&bhm RALT N5	&bhm RSHIFT N7
-							&kp BSLH        &none  			&none    		&none			&none        				&none	 		&none			&none       	&none 		&none
+							&kp BSLH        &kp SQT  		&none    		&none			&none        				&none	 		&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
 																							&none      					&kp BSPC		&kp TILDE2
                         >;
                 };
@@ -149,20 +149,11 @@
                         bindings = <
 						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
 						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&sys_reset		&bootloader			&none			&none 			&none
+						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&sys_reset		&bootloader		&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
 						>;
                 };
-				
-				tb_layer {
-                        bindings = <
-						   &kp F6 				&kp F4 			&kp F2 		&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3		&kp F5 		&kp F7
-						   &none      			&none			&none		&none 			&none		   		    	&none	    	&kp RCTRL     	&kp RGUI   	&kp RALT	&kp RSHIFT	 
-						   &none	 			&tog 4 	 		&none		&none			&none           		&sys_reset		&bootloader		&none		&tog 5 		&none
-																							&kp SPACE     				&none			&none
-						>;
-                };
-				
+
 				fusion_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
@@ -174,7 +165,7 @@
 				
 				shoter_layer {
                         bindings = <
-						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&none			&none 		&tog 5
+						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&none			&none 		&tog 4
 						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&mkp MCLK	&none
 						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
 																					&lt 1 SPACE     			&none		 	&none
