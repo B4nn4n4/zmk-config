@@ -133,10 +133,10 @@
 						>;
                 };
 
-				shoter_layer {
+				mouse_layer {
                         bindings = <
 						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
-						   &none 			&none 			&mkp RCLK		&mkp LCLK 		&none      					&none 			&none 			&none			&none 		&none
+						   &none 			&none 			&mkp RCLK		&mkp LCLK 	&none      					&none 			&none 			&none			&none 		&none
 						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
 																						&none						&none		 	&none
 						>;
