@@ -48,23 +48,23 @@
 				bindings = <&kp ESC>;
 			};
 			
-			combo_leftclick {
-				timeout-ms = <50>;
-				key-positions = <11 12>;
-				bindings = <&mkp RCLK>;
-			};
+			// combo_leftclick {
+			// 	timeout-ms = <50>;
+			// 	key-positions = <11 12>;
+			// 	bindings = <&mkp RCLK>;
+			// };
 			
-			combo_doublleftclick {
-				timeout-ms = <50>;
-				key-positions = <11 12 13>;
-				bindings = <&mkp RCLK &mkp RCLK>;
-			};
+			// combo_doublleftclick {
+			// 	timeout-ms = <50>;
+			// 	key-positions = <11 12 13>;
+			// 	bindings = <&mkp RCLK &mkp RCLK>;
+			// };
 			
-			combo_rightclick {
-				timeout-ms = <50>;
-				key-positions = <12 13>;
-				bindings = <&mkp LCLK>;
-			};
+			// combo_rightclick {
+			// 	timeout-ms = <50>;
+			// 	key-positions = <12 13>;
+			// 	bindings = <&mkp LCLK>;
+			// };
 			
 			combo_middleclick {
 				timeout-ms = <50>;
@@ -95,11 +95,11 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 10>,<&zip_temp_layer 3 500>;
+            input-processors = <&zip_xy_scaler 1 1>,<&zip_temp_layer 3 100>;
 			
 			scroll{
                 layers = <2>;
-                input-processors = <&zip_xy_scaler 1 10>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
+                input-processors = <&zip_xy_scaler 1 100>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
 
