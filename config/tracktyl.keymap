@@ -123,7 +123,7 @@
 				fusion_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTR T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
 							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
