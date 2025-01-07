@@ -95,11 +95,11 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 10>,<&zip_temp_layer 0 1000>;
+            input-processors = <&zip_xy_scaler 1 10>,<&zip_temp_layer 3 500>;
 			
 			scroll{
                 layers = <2>;
-                input-processors = <&zip_xy_scaler 1 40>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
+                input-processors = <&zip_xy_scaler 1 10>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
 
@@ -130,6 +130,15 @@
 						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp RCTRL		&kp RGUI  		&kp RALT		&bhm RSHIFT K_CMENU 
 						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&sys_reset		&bootloader		&none			&none 			&none
 				 																			&kp SPACE     				&none		 	&none
+						>;
+                };
+
+				shoter_layer {
+                        bindings = <
+						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
+						   &none 			&none 			&mkp RCLK		&mkp LCLK 		&none      					&none 			&none 			&none			&none 		&none
+						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
+																						&none						&none		 	&none
 						>;
                 };
 
