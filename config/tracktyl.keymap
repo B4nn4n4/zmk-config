@@ -138,7 +138,7 @@
 						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
 						   &none 			&none 			&mkp RCLK		&mkp LCLK 	&none      					&none 			&none 			&none			&none 		&none
 						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
-																						&none						&none		 	&none
+																						&none						&mo 2			&mo 3
 						>;
                 };
 
