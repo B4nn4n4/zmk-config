@@ -23,21 +23,21 @@
 				bindings = <&kp>, <&kp>;
 			}; 
 			
-			bmm: balanced_mouse_mods {
-				compatible = "zmk,behavior-hold-tap";
-				#binding-cells = <2>;
-				tapping-term-ms = <200>;    // <---[[moderate duration]]
-				quick-tap-ms = <0>;
-				flavor = "balanced";
-				bindings = <&kp>, <&mkp>;
-			};
+			// bmm: balanced_mouse_mods {
+			// 	compatible = "zmk,behavior-hold-tap";
+			// 	#binding-cells = <2>;
+			// 	tapping-term-ms = <200>;    // <---[[moderate duration]]
+			// 	quick-tap-ms = <0>;
+			// 	flavor = "balanced";
+			// 	bindings = <&kp>, <&mkp>;
+			// };
 			 
-			mosc: mouse_scrollt {
-				compatible = "zmk,behavior-mod-morph";
-				#binding-cells = <0>;
-				bindings = <&kp A>, <&kp B>;
-				mods = <(MOD_LSFT|MOD_RSFT)>;
-			};
+			// mosc: mouse_scrollt {
+			// 	compatible = "zmk,behavior-mod-morph";
+			// 	#binding-cells = <0>;
+			// 	bindings = <&kp A>, <&kp B>;
+			// 	mods = <(MOD_LSFT|MOD_RSFT)>;
+			// };
 		};
 		
 		combos {
@@ -95,7 +95,7 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 1>,<&zip_temp_layer 3 100>;
+            input-processors = <&zip_xy_scaler 1 1>,<&zip_temp_layer 3 400>;
 			
 			scroll{
                 layers = <2>;
