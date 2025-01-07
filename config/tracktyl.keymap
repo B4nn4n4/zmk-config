@@ -96,33 +96,12 @@
             compatible = "zmk,input-listener";
             device = <&trackball>;
             input-processors = <&zip_xy_scaler 1 6>,<&zip_temp_layer 0 1000>;
-        };
-		
-        behaviors {
-            // keys to a fake mouse input device
-            mm: mouse_move {
-                compatible = "zmk,behavior-input-two-axis";
-                #binding-cells = <1>;
-                trigger-period-ms = <12>;
-                x-input-code = <INPUT_REL_X>;
-                y-input-code = <INPUT_REL_Y>;
-                time-to-max-speed-ms = <300>;
-                acceleration-exponent = <1>;
-            };
-        };
-
-        // mapping the fake keys to mouse device tack to the layers
-        mmv_input_listener {
-            compatible = "zmk,input-listener";
-            device = <&mm>;
-            input-processors = <&zip_xy_scaler 1 1>, <&zip_temp_layer 0 1000>;
-
-            scroll {
-                layers = <1>;
+			
+			scroll{
+                layers = <2>;
                 input-processors = <&zip_xy_scaler 1 50>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
             };
         };
-		
 
         keymap {
                 compatible = "zmk,keymap";
