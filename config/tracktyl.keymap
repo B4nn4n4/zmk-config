@@ -116,9 +116,10 @@
 
                 default_layer {
                         bindings = <
-							&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
-							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
                 };
 				
@@ -142,7 +143,7 @@
 
 				mouse_layer {
                         bindings = <
-						   &kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
+							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
 							&bhm LSHIFT A 	&bhm LALT R 	&bmm LGUI RCLK	&bmm LCTRL LCLK &kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
