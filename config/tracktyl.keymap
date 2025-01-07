@@ -31,7 +31,16 @@
 				flavor = "balanced";
 				bindings = <&mo>, <&mkp>;
 			};
-			 
+
+			bmm: balanced_mouserow_mods {
+				compatible = "zmk,behavior-hold-tap";
+				#binding-cells = <2>;
+				tapping-term-ms = <200>;    // <---[[moderate duration]]
+				quick-tap-ms = <0>;
+				flavor = "balanced";
+				bindings = <&kp>, <&mkp>;
+			};
+
 			// mosc: mouse_scrollt {
 			// 	compatible = "zmk,behavior-mod-morph";
 			// 	#binding-cells = <0>;
@@ -68,7 +77,7 @@
 			
 			combo_middleclick {
 				timeout-ms = <50>;
-				key-positions = <11 13>;
+				key-positions = <12 13>;
 				bindings = <&mlt 2 MCLK>;
 			};
 			
@@ -89,7 +98,6 @@
 				key-positions = <0 24>;
 				bindings = <&sys_reset>;
 			};
-			
 		};
 
 		trackball_listener {
@@ -108,8 +116,7 @@
 
                 default_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&bhm RCTRL N    &bhm RGUI E 	&bhm RALT I &bhm RSHIFT O  
+							&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&bhm RCTRL N    &bhm RGUI E 	&bhm RALT I &bhm RSHIFT O  
 							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
@@ -135,10 +142,10 @@
 
 				mouse_layer {
                         bindings = <
-						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
-						   &none 			&none 			&mkp RCLK		&mkp LCLK 	&none      					&none 			&none 			&none			&none 		&none
-						   &none 			&none 			&none			&none 		&none      					&none 			&none 			&none			&none 		&none
-																						&none						&mo 2			&mo 3
+						   &kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
+							&bhm LSHIFT A 	&bhm LALT R 	&bmm LGUI RCLK	&bmm LCTRL LCLK &kp D    			&kp H 		&bhm RCTRL N    &bhm RGUI E 	&bhm RALT I &bhm RSHIFT O  
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
 						>;
                 };
 
