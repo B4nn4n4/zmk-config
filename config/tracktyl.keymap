@@ -73,7 +73,7 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 3 300>;
+            input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 3 250>;
 			
 			scroll{
                 layers = <2>;
@@ -116,7 +116,7 @@
 							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
 							&bhm LSHIFT A 	&bhm LALT R 	&mkp RCLK		&mkp LCLK 		&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+																							&mo 1				&mo 2		&mo 3
 						>;
                 };
 
