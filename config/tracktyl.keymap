@@ -113,10 +113,10 @@
 
 				mouse_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&mkp RCLK		&mkp LCLK 		&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
-							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																							&mo 1				&mo 2		&mo 3
+							&none		 	&none			&none			&none 			&none    			&none		&none			&none			&none 		&none
+							&none			&none		 	&mkp RCLK		&mkp LCLK 		&none    			&none		&none			&none			&none 		&none 
+							&none		 	&none			&none			&none 			&none    			&none		&none			&none			&none 		&none
+																							&none				&none		&none
 						>;
                 };
 
