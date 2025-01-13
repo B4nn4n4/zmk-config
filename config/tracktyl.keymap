@@ -85,56 +85,56 @@
                 compatible = "zmk,keymap";
 
                 default_layer {
-                        bindings = <
-							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J		&kp L       	&kp U    		&kp Y   	&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
-							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+                        bindings = <	
+							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J			&kp L       	&kp U    		&kp Y   	&kp SEMI
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 			&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+																							&lt 1 SPACE    		&lt 2 BSPC  	&lt 3 ENTER
                         >;
                 };
 				
                 lower_layer {
                         bindings = <
-							&kp F6 			&kp F4 			&kp F2 			&kp F10 		&kp F8     					&kp F9 			&kp F1 			&kp  F3			&kp F5 			&kp F7
-							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       				&kp N9      	&bhm LCTRL N1 	&bhm LGUI N3   	&bhm LALT N5	&bhm LSHIFT N7
-							&kp BSLH        &kp SQT  		&none    		&none			&none        				&none	 		&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
-																							&none      					&kp BSPC		&kp TILDE2
+							&kp F6 			&kp F4 			&kp F2 			&kp F10 		&kp F8     			&kp F9 			&kp F1 			&kp  F3			&kp F5 			&kp F7
+							&bhm LSHIFT N6	&bhm LALT N4    &bhm LGUI N2 	&bhm LCTRL N0  	&kp N8       		&kp N9      	&bhm LCTRL N1 	&bhm LGUI N3   	&bhm LALT N5	&bhm LSHIFT N7
+							&kp BSLH  t      &kp SQT  		&none    		&none			&none        		&none	 		&kp LBKT		&kp RBKT		&kp MINUS 		&kp EQUAL
+																							&none      			&kp BSPC		&kp PAUSE_BREAK
                         >;
                 };
 				
                 raise_layer {
                         bindings = <
-						   &kp ESC 			   	&kp HOME   		&kp UP   	&kp END    		&none 					    &none     		&none        	&none	      	&none      		&kp DEL
-						   &kp TAB      		&kp LEFT   		&kp DOWN	&kp RIGHT  		&none   			    	&none	    	&kp LCTRL		&kp LGUI  		&kp LALT		&bhm LSHIFT K_CMENU 
-						   &none	 			&kp C_PREV 	 	&kp C_PP  	&kp C_NEXT		&none           			&sys_reset		&bootloader		&none			&none 			&none
-				 																			&kp SPACE     				&none		 	&none
+						   &kp ESC 			&kp HOME   		&kp UP   		&kp END    		&none 				&none     		&none        	&none	      	&none      		&kp DEL
+						   &kp TAB      	&kp LEFT   		&kp DOWN		&kp RIGHT  		&none   			&none	    	&kp LCTRL		&kp LGUI  		&kp LALT		&bhm LSHIFT K_CMENU 
+						   &none			&kp C_PREV 	 	&kp C_PP  		&kp C_NEXT		&none           	&sys_reset		&bootloader		&none			&none 			&none
+				 																			&kp SPACE     		&none		 	&none
 						>;
                 };
 
 				mouse_layer {
                         bindings = <
-							&none		 	&none			&none			&none 			&none    			&none		&none			&none			&none 		&none
-							&none			&none		 	&mkp RCLK		&mkp LCLK 		&none    			&none		&none			&none			&none 		&none 
-							&none		 	&none			&none			&none 			&none    			&none		&none			&none			&none 		&none
-																							&none				&none		&none
+							&none		 	&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
+							&none			&none		 	&mkp RCLK		&mkp LCLK 		&none    			&none			&none			&none			&none 		&none 
+							&none		 	&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
+																							&none				&none			&none
 						>;
                 };
 
 				fusion_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   			&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 		&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
-							&kp Z 			&kp X 			&kp C 				&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																								&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&tog 4
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
                         >;
                 };
 				
 				shoter_layer {
                         bindings = <
-						   &kp TAB			&kp Q 			&kp W		&kp E 		&kp R      					&none 			&none 			&none			&none 		&tog 4
-						   &kp LSHIFT     	&kp A		   	&kp S		&kp D 		&kp F 		   		    	&none	    	&mkp LCLK     	&mkp RCLK   	&mkp MCLK	&none
-						   &kp LCTRL		&kp Y 	 		&kp X  		&kp C		&kp V           			&none		 	&none			&none			&none 		&none
-																					&lt 1 SPACE     			&none		 	&none
+						   &kp TAB			&kp Q 			&kp W			&kp E 		&kp R      				&none		&none 			&none			&none 		&tog 4
+						   &kp LSHIFT     	&kp A		   	&kp S			&kp D 		&kp F 		   		    &none    	&mkp LCLK     	&mkp RCLK   	&mkp MCLK	&none
+						   &kp LCTRL		&kp Y 	 		&kp X  			&kp C		&kp V           		&none	 	&none			&none			&none 		&none
+																						&lt 1 SPACE     		&none	 	&none
 						>;
                 };
         };
