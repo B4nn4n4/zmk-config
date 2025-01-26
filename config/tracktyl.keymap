@@ -32,15 +32,14 @@
 				bindings = <&mo>, <&mkp>;
 			};
 
-			// Currently not in USE
-			// bmm: balanced_mouserow_mods {
-			// 	compatible = "zmk,behavior-hold-tap";
-			// 	#binding-cells = <2>;
-			// 	tapping-term-ms = <200>;    // <---[[moderate duration]]
-			// 	quick-tap-ms = <0>;
-			// 	flavor = "balanced";
-			// 	bindings = <&kp>, <&mkp>;
-			// };
+			bmm: balanced_mouserow_mods {
+				compatible = "zmk,behavior-hold-tap";
+			 	#binding-cells = <2>;
+			 	tapping-term-ms = <200>;    // <---[[moderate duration]]
+			 	quick-tap-ms = <0>;
+			 	flavor = "balanced";
+			 	bindings = <&kp>, <&mkp>;
+			};
 		};
 		
 		combos {
@@ -123,7 +122,7 @@
 				fusion_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&none
-							&mkp RS(MCLK) 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&mkp LCLK    	&mkp RCLK 		&mkp MCLK	&mkp RS(MCLK)  
+							&bmm A RS(MCLK) &bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE    		&lt 2 BSPC  &tog 5
                         >;
