@@ -87,13 +87,13 @@
         };
 
         keymap {
-                compatible = "zmk,keymap";
-
-                default_layer {
-                        bindings = <	
-							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp	J			&kp L       	&kp U    		&kp Y   	&kp SEMI
+			compatible = "zmk,keymap";
+			
+				default_layer {
+						bindings = <	
+							&kp Q 			&kp W 			&kp F   		&kp P			&kp G    			&kp	J			&kp L			&kp U			&kp Y   	&kp SEMI
 							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
-							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 			&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 			&kp M			&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE    		&lt 2 BSPC  	&lt 3 ENTER
                         >;
                 };
@@ -109,37 +109,37 @@
 				
                 raise_layer {
                         bindings = <
-						   &kp ESC 			&kp HOME   		&kp UP   		&kp END    		&none 				&bootloader	   	&tog 5       	&tog 6	      	&none      		&kp DEL
-						   &kp TAB      	&kp LEFT   		&kp DOWN		&kp RIGHT  		&none   			&none	    	&kp LCTRL		&kp LGUI  		&kp LALT		&bhm LSHIFT K_CMENU 
-						   &none			&kp C_PREV 	 	&kp C_PP  		&kp C_NEXT		&none           	&sys_reset		&none 			&none			&none 			&none
-				 																			&kp SPACE     		&none		 	&none
+						&kp ESC				&kp HOME		&kp UP			&kp END			&none				&bootloader		&tog 5			&tog 6			&none			&kp DEL
+						   &kp TAB			&kp LEFT		&kp DOWN		&kp RIGHT		&none				&none			&kp LCTRL		&kp LGUI		&kp LALT		&bhm LSHIFT K_CMENU 
+						   &none			&kp C_PREV		&kp C_PP  		&kp C_NEXT		&none				&sys_reset		&none			&none			&none			&none
+				 																			&kp SPACE			&none		 	&none
 						>;
                 };
 
 				mouse_layer {
                         bindings = <
-							&none		 	&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
-							&none			&none		 	&mkp RCLK		&mkp LCLK 		&none    			&none			&none			&none			&none 		&none 
-							&none		 	&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
+							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
+							&none			&none			&mkp RCLK		&mkp LCLK 		&none    			&none			&none			&none			&none 		&none 
+							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
 																							&none				&none			&none
 						>;
                 };
 
 				fusion_layer {
                         bindings = <
-							&kp Q 			&kp W 			&kp F   		&kp P       	&kp G    			&kp J		&kp L       	&kp U    		&kp Y   	&none
-							&bmm A RS(MCLK) &bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
-							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 		&kp M       	&kp CMMA 		&kp DOT 	&kp FSLH
-																							&lt 1 SPACE    		&lt 2 BSPC  &lt 3 ENTER
+							&kp Q 			&kp W 			&kp F   		&kp P			&kp G				&kp J		&kp L       	&kp U    		&kp Y   	&none
+							&bmm A RS(MCLK) &bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T	&kp D				&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
+							&kp Z 			&kp X 			&kp C 			&kp V			&kp B				&kp K		&kp M			&kp CMMA 		&kp DOT 	&kp FSLH
+																							&lt 1 SPACE			&lt 2 BSPC  &lt 3 ENTER
                         >;
                 };
 				
 				gaming_layer {
                         bindings = <
-						   &kp TAB			&kp Q 			&kp W			&kp E 		&kp R      				&kp	T		&kp Z       	&kp U    		&kp I   	&kp O
-						   &kp LSHIFT     	&kp A		   	&kp S			&kp D 		&kp F 		   		    &kp G    	&mkp LCLK     	&mkp RCLK   	&kp K 		&kp L
-						   &kp LCTRL		&kp Y 	 		&kp X  			&kp C		&kp V           		&kp B 		&kp N       	&kp M	 		&kp CMMA 	&kp DOT
-																						&lt 1 SPACE     		&lt 2 BSPC  &lt 3 ENTER
+						   &kp TAB			&kp Q 			&kp W			&kp E 		&kp R					&kp	T		&kp Z			&kp U			&kp I   	&kp O
+						   &kp LSHIFT     	&kp A		   	&kp S			&kp D 		&kp F					&kp G		&mkp LCLK		&mkp RCLK		&kp K 		&kp L
+						   &kp LCTRL		&kp Y 	 		&kp X  			&kp C		&kp V					&kp B		&kp N			&kp M			&kp CMMA 	&kp DOT
+																						&lt 1 SPACE				&lt 2 BSPC  &lt 3 ENTER
 						>;
                 };
         };
