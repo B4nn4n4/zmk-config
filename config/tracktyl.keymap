@@ -121,7 +121,7 @@
 							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
 							&none			&none			&mkp RCLK		&mkp LCLK 		&none    			&none			&none			&none			&none 		&none 
 							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
-																							&none				&none			&none
+																							&lt 1 SPACE    		&lt 2 BSPC  	&lt 3 ENTER
 						>;
                 };
 
