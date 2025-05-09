@@ -78,7 +78,7 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 3 250>;
+            input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 3 350>;
 			
 			scroll{
                 layers = <2>;
@@ -92,7 +92,7 @@
 				default_layer {
 						bindings = <	
 							&kp Q 			&kp W 			&kp F   		&kp P			&kp G    			&kp	J			&kp L			&kp U			&kp Y   	&kp SEMI
-							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
+							&bhm LSHIFT A 	&bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T 	&kp D    			&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O
 							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 			&kp M			&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE    		&lt 2 BSPC  	&lt 3 ENTER
                         >;
@@ -118,9 +118,9 @@
 
 				mouse_layer {
                         bindings = <
-							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
-							&none			&none			&mkp RCLK		&mkp LCLK 		&none    			&none			&none			&none			&none 		&none 
-							&none			&none			&none			&none 			&none    			&none			&none			&none			&none 		&none
+							&kp Q 			&kp W 			&kp F   		&kp P			&kp G    			&kp	J			&kp L			&kp U			&kp Y   	&kp SEMI
+							&bhm LSHIFT N6	&bhm LALT N4	&mkp RCLK		&mkp LCLK 		&kp D    			&kp H 			&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O
+							&kp Z 			&kp X 			&kp C 			&kp V     		&kp B    			&kp K 			&kp M			&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE    		&lt 2 BSPC  	&lt 3 ENTER
 						>;
                 };
@@ -128,7 +128,7 @@
 				fusion_layer {
                         bindings = <
 							&kp Q 			&kp W 			&kp F   		&kp P			&kp G				&kp J		&kp L       	&kp U    		&kp Y   	&none
-							&bmm A RS(MCLK) &bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T	&kp D				&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O  
+							&bmm A RS(MCLK) &bhm LALT R 	&bhm LGUI S 	&bhm LCTRL T	&kp D				&kp H 		&bhm LCTRL N    &bhm LGUI E 	&bhm LALT I &bhm LSHIFT O
 							&kp Z 			&kp X 			&kp C 			&kp V			&kp B				&kp K		&kp M			&kp CMMA 		&kp DOT 	&kp FSLH
 																							&lt 1 SPACE			&lt 2 BSPC  &lt 3 ENTER
                         >;
