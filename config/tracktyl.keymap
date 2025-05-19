@@ -51,7 +51,7 @@
 			};
 			
 			combo_middleclick {
-				timeout-ms = <50>;:
+				timeout-ms = <50>;
 				key-positions = <12 13>;
 				bindings = <&mlt 2 MCLK>;
 			};
