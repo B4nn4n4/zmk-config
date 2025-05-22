@@ -78,7 +78,7 @@
 		trackball_listener {
             compatible = "zmk,input-listener";
             device = <&trackball>;
-            input-processors = <&zip_xy_swap_mapper><&zip_x_scaler 50 100>,<&zip_y_scaler 90 100>,<&zip_temp_layer 3 350>; //X Horizontal/Y Vertical
+            input-processors = <&zip_xy_swap_mapper>,<&zip_x_scaler 50 100>,<&zip_y_scaler 90 100>,<&zip_temp_layer 3 350>; //X Horizontal/Y Vertical
 			
 			scroll{
                 layers = <2>;
