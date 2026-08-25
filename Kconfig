@@ -43,6 +43,10 @@ config ZMK_BATTERY_INDICATOR_LOW_THRESHOLD
     int "State of charge percent below which the indicator shows solid red"
     default 20
 
+config ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
+    int "State of charge percent at or above which the indicator shows a solid full bar"
+    default 80
+
 config ZMK_BATTERY_INDICATOR_CHARGING
     bool "Pulse the battery bar while USB power is connected"
     default y

@@ -41,8 +41,8 @@ no local toolchain here.
   system(4)=blue, reserved/default=0), selected via `chosen { zmk,layer-colors =
   &layer_colors; }`. Layer state exists only on the central; peripherals receive the
   active color through the `lc` relay behavior (see gotchas below). Indicator states,
-  ascending precedence: dark < low-batt red (unplugged only) < charging pulse <
-  layer colors < `&bat` bar; there is deliberately NO full-battery pulse and no
+  ascending precedence: dark < low-batt red (unplugged only) < charging pulse < full
+  solid green (≥80%) < layer colors < `&bat` bar; there is deliberately no
   BT-profile display
 - `config/hatsu_left.keymap` is the single source of truth; `config/hatsu_right.keymap`
   is a git **symlink** to it (T in `git status` = typechange). The build requires a

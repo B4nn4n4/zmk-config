@@ -93,6 +93,7 @@ enum indicator_state {
     IND_STATE_BAT_BAR,
     IND_STATE_LOW,
     IND_STATE_LAYER,
+    IND_STATE_FULL,
     IND_STATE_CHARGING,
 };
 
@@ -200,6 +201,10 @@ static enum indicator_state evaluate_state(void) {
     }
 #endif
 
+    if (soc >= CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
+        return IND_STATE_FULL;
+    }
+
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
     // Charging outranks low-batt red so the bar shows charge progress while plugged
     // in; unplug and a <20% cell goes back to solid red.
@@ -239,6 +244,9 @@ static void render(enum indicator_state state) {
         break;
     case IND_STATE_LAYER:
         set_all_leds(layer_color, 255);
+        break;
+    case IND_STATE_FULL:
+        set_all_leds(COLOR_BAT, 255);
         break;
     case IND_STATE_CHARGING:
         set_bar_leds(COLOR_BAT, bar_length, pulse_brightness());
@@ -335,6 +343,16 @@ static int indicator_event_listener(const zmk_event_t *eh) {
     }
 #endif
 
+#if !KEYMAP_LOCAL && LAYER_COLORS_ENABLED
+    // The peripheral never sees layer_state_changed (central-only compile), so
+    // evaluate layer colors on every keypress and let the relay arriving later
+    // overwrite with the central's authoritative value.
+    const struct zmk_position_state_changed *pos_ev = as_zmk_position_state_changed(eh);
+    if (pos_ev) {
+        k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
+    }
+#endif
+
     k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
     return ZMK_EV_EVENT_BUBBLE;
 }
@@ -349,6 +367,7 @@ ZMK_SUBSCRIPTION(battery_indicator, zmk_split_peripheral_status_changed);
 #endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
+ZMK_SUBSCRIPTION(battery_indicator, zmk_position_state_changed);
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 ZMK_SUBSCRIPTION(battery_indicator, zmk_usb_conn_state_changed);
 #endif
