@@ -26,7 +26,6 @@
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/events/split_peripheral_status_changed.h>
-#include <zmk/events/position_state_changed.h>
 
 #define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
 
@@ -102,6 +101,7 @@ static enum zmk_activity_state activity_state = ZMK_ACTIVITY_ACTIVE;
 static int64_t bat_show_until;
 static uint32_t tick;
 static uint32_t layer_color;
+static bool suppress_layer_render; // central: defer render to sync with peripheral
 
 // Mirrored from the central by the lc behavior on split peripherals.
 static uint32_t remote_layer_color;
@@ -265,6 +265,15 @@ static void indicator_work_handler(struct k_work *work) {
             render(IND_STATE_OFF);
             last_state = IND_STATE_OFF;
         }
+        suppress_layer_render = false;
+        return;
+    }
+
+    if (suppress_layer_render) {
+        suppress_layer_render = false;
+        // Start a one-shot timer so the deferred tick re-evaluates and renders
+        // after the peripheral has received the relay.
+        k_timer_start(&indicator_timer, K_MSEC(TICK_MS), K_MSEC(TICK_MS));
         return;
     }
 
@@ -330,26 +339,15 @@ static int indicator_event_listener(const zmk_event_t *eh) {
     }
 
 #if KEYMAP_LOCAL && LAYER_COLORS_ENABLED
-    // Relay on layer changes, on wake from idle, and when a peripheral reconnects
-    // (it missed every update while asleep). The layer-state event implementation is
-    // only compiled into the central build, so these references must stay in this
-    // guard or the peripheral link fails.
     const struct zmk_layer_state_changed *layer_ev = as_zmk_layer_state_changed(eh);
     const struct zmk_split_peripheral_status_changed *periph_ev =
         as_zmk_split_peripheral_status_changed(eh);
 
-    if (layer_ev || activity_ev || (periph_ev && periph_ev->connected)) {
+    if (layer_ev) {
         send_remote_layer_color();
-    }
-#endif
-
-#if !KEYMAP_LOCAL && LAYER_COLORS_ENABLED
-    // The peripheral never sees layer_state_changed (central-only compile), so
-    // evaluate layer colors on every keypress and let the relay arriving later
-    // overwrite with the central's authoritative value.
-    const struct zmk_position_state_changed *pos_ev = as_zmk_position_state_changed(eh);
-    if (pos_ev) {
-        k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
+        suppress_layer_render = true;
+    } else if (activity_ev || (periph_ev && periph_ev->connected)) {
+        send_remote_layer_color();
     }
 #endif
 
@@ -367,7 +365,6 @@ ZMK_SUBSCRIPTION(battery_indicator, zmk_split_peripheral_status_changed);
 #endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
-ZMK_SUBSCRIPTION(battery_indicator, zmk_position_state_changed);
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 ZMK_SUBSCRIPTION(battery_indicator, zmk_usb_conn_state_changed);
 #endif
