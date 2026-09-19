@@ -1,0 +1,11 @@
+description: Battery indicator LED channel map
+
+compatible: "zmk,battery-indicator-map"
+
+properties:
+  led-channels:
+    type: phandle-array
+    required: true
+  colors:
+    type: uint8-array
+    required: true

@@ -1,0 +1,5 @@
+description: Battery Indicator Behavior
+
+compatible: "zmk,behavior-battery-indicator"
+
+include: zero_param.yaml

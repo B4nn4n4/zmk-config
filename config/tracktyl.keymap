@@ -1,0 +1,169 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/mouse.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include "layouts/alphas.h"
+
+#define BASE_QWERTY 0
+#define BASE_COLEMAK 1
+#define LOWER 2
+#define RAISE 3
+#define SYSTEM 4
+#define MOUSE 5
+#define FUSION 6
+#define GAMING 7
+
+/ {
+    behaviors {
+#include "behaviors/homerow.dtsi"
+
+        mlt: mouse_layer_tap {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <200>;
+            quick-tap-ms = <0>;
+            flavor = "balanced";
+            bindings = <&mo>, <&mkp>;
+        };
+
+        bmm: balanced_mouserow_mods {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <200>;
+            quick-tap-ms = <0>;
+            flavor = "balanced";
+            bindings = <&kp>, <&mkp>;
+        };
+    };
+
+    combos {
+        compatible = "zmk,combos";
+        combo_esc {
+            timeout-ms = <50>;
+            key-positions = <0 1>;
+            bindings = <&kp ESC>;
+        };
+        combo_middleclick {
+            timeout-ms = <50>;
+            key-positions = <12 13>;
+            bindings = <&mlt 2 MCLK>;
+        };
+        combo_middlepress {
+            timeout-ms = <50>;
+            key-positions = <16 17>;
+            bindings = <&mkp MCLK>;
+        };
+        combo_bootload {
+            timeout-ms = <50>;
+            key-positions = <0 30>;
+            bindings = <&bootloader>;
+        };
+        combo_sysreset {
+            timeout-ms = <50>;
+            key-positions = <0 24>;
+            bindings = <&sys_reset>;
+        };
+    };
+
+    trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+        input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 3 250>;
+        scroll {
+            layers = <2>;
+            input-processors = <&zip_xy_scaler 1 100>, <&zip_xy_to_scroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        /* 0: QWERTY — 33-key Tractyl */
+        base_qwerty {
+            label = "qwerty";
+            bindings = <
+                &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5    &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5
+                &bhm LSHIFT QW_R2L1  &bhm LALT QW_R2L2  &bhm LGUI QW_R2L3  &bhm LCTRL QW_R2L4  &kp QW_R2L5    &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5
+                &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5    &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5
+                                                                &lt LOWER SPACE  &lt RAISE BSPC  &lt SYSTEM ENTER
+            >;
+        };
+
+        /* 1: Colemak — runtime toggle via SYSTEM (&tog) */
+        base_colemak {
+            label = "colemak";
+            bindings = <
+                &kp CM_R1L1  &kp CM_R1L2  &kp CM_R1L3  &kp CM_R1L4  &kp CM_R1L5    &kp CM_R1R1  &kp CM_R1R2  &kp CM_R1R3  &kp CM_R1R4  &kp CM_R1R5
+                &bhm LSHIFT CM_R2L1  &bhm LALT CM_R2L2  &bhm LGUI CM_R2L3  &bhm LCTRL CM_R2L4  &kp CM_R2L5    &kp CM_R2R1  &bhm LCTRL CM_R2R2  &bhm LGUI CM_R2R3  &bhm LALT CM_R2R4  &bhm LSHIFT CM_R2R5
+                &kp CM_R3L1  &kp CM_R3L2  &kp CM_R3L3  &kp CM_R3L4  &kp CM_R3L5    &kp CM_R3R1  &kp CM_R3R2  &kp CM_R3R3  &kp CM_R3R4  &kp CM_R3R5
+                                                                &lt LOWER SPACE  &lt RAISE BSPC  &lt SYSTEM ENTER
+            >;
+        };
+
+        /* 2: LOWER / NUM — shared */
+        lower_layer {
+            label = "num";
+            bindings = <
+                &kp F7  &kp F5  &kp F3  &kp F1  &kp F9    &kp F10  &kp F2  &kp F4  &kp F6  &kp F8
+                &bhm LSHIFT N7 &bhm LALT N5 &bhm LGUI N3 &bhm LCTRL N1 &kp N9   &kp N0  &bhm LCTRL N2 &bhm LGUI N4 &bhm LALT N6 &bhm LSHIFT N8
+                &kp BSLH &kp SQT &none &none &none    &none  &kp LBKT &kp RBKT &kp MINUS &kp EQUAL
+                                                                &none  &kp BSPC  &kp PAUSE_BREAK
+            >;
+        };
+
+        /* 3: RAISE / NAV — unified */
+        raise_layer {
+            label = "raise";
+            bindings = <
+                &kp ESC &kp HOME &kp UP &kp END &none    &bootloader &tog 6 &tog 7 &none &kp DEL
+                &kp TAB &kp LEFT &kp DOWN &kp RIGHT &none    &none &kp LCTRL &kp LGUI &kp LALT &bhm LSHIFT K_CMENU
+                &none &kp C_PREV &kp C_PP &kp C_NEXT &none    &sys_reset &none &none &none &none
+                                                                &kp SPACE &none &none
+            >;
+        };
+
+        /* 4: SYSTEM — includes Colemak/QWERTY toggle */
+        system_layer {
+            label = "system";
+            bindings = <
+                &tog 0 &tog 1 &trans &trans &trans   &trans &trans &trans &trans &trans
+                &bt BT_NXT &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+                &bt BT_PRV &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+                                                                &trans &trans &trans
+            >;
+        };
+
+        /* 5: MOUSE */
+        mouse_layer {
+            label = "mouse";
+            bindings = <
+                &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5    &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5
+                &bhm LSHIFT QW_R2L1  &bhm LALT QW_R2L2  &mkp RCLK &mkp LCLK &kp QW_R2L5    &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5
+                &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5    &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5
+                                                                &kp SPACE  &kp BSPC  &kp ENTER
+            >;
+        };
+
+        fusion_layer {
+            label = "fusion";
+            bindings = <
+                &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5    &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5
+                &bmm A RS(MCLK) &bhm LALT QW_R2L2  &bhm LGUI QW_R2L3  &bhm LCTRL QW_R2L4  &kp QW_R2L5    &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5
+                &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5    &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5
+                                                                &lt LOWER SPACE  &lt RAISE BSPC  &lt SYSTEM ENTER
+            >;
+        };
+
+        gaming_layer {
+            label = "gaming";
+            bindings = <
+                &kp TAB &kp Q &kp W &kp E &kp R    &kp T &kp Z &kp U &kp I &kp O
+                &kp LSHIFT &kp A &kp S &kp D &kp F    &kp G &mkp LCLK &mkp RCLK &kp K &kp L
+                &kp LCTRL &kp Y &kp X &kp C &kp V    &kp B &kp N &kp M &kp CMMA &kp DOT
+                                                                &lt LOWER SPACE  &lt RAISE BSPC  &lt SYSTEM ENTER
+            >;
+        };
+    };
+};

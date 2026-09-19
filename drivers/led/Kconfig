@@ -1,0 +1,7 @@
+config AW20216S
+    bool "Awinic AW20216S LED driver"
+    default y
+    depends on DT_HAS_AWINIC_AW20216S_ENABLED
+    select SPI
+    help
+      Awinic AW20216S SPI LED driver.

@@ -1,0 +1,7 @@
+# Tractyl (nice_nano_v2 + tracktyl shields) — isolated pipeline (stable v0.3)
+---
+include:
+  - board: nice_nano_v2
+    shield: tracktyl_left
+  - board: nice_nano_v2
+    shield: tracktyl_right

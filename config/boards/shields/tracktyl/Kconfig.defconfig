@@ -1,0 +1,19 @@
+if Tracktyl_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "Tracktyl"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
+ 
+
+if Tracktyl_LEFT || Tracktyl_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SLEEP
+	default y
+endif 

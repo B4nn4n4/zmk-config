@@ -1,0 +1,8 @@
+description: Per-layer RGB indicator colors
+
+compatible: "zmk,layer-colors"
+
+properties:
+  colors:
+    type: array
+    required: true

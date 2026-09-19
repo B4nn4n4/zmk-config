@@ -1,0 +1,8 @@
+description: Backlight LED channel map
+
+compatible: "zmk,backlight-map"
+
+properties:
+  led-channels:
+    type: phandle-array
+    required: true

@@ -1,0 +1,41 @@
+name: Build Hatsu
+on:
+  push:
+    paths:
+      - 'config/hatsu_left.keymap'
+      - 'config/hatsu_right.keymap'
+      - 'config/hatsu_left.conf'
+      - 'config/hatsu_right.conf'
+      - 'boards/**'
+      - 'dts/**'
+      - 'drivers/**'
+      - 'src/**'
+      - 'include/**'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
+      - 'zephyr/**'
+      - 'build-hatsu.yaml'
+  pull_request:
+    paths:
+      - 'config/hatsu_left.keymap'
+      - 'config/hatsu_right.keymap'
+      - 'config/hatsu_left.conf'
+      - 'config/hatsu_right.conf'
+      - 'boards/**'
+      - 'dts/**'
+      - 'drivers/**'
+      - 'src/**'
+      - 'include/**'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
+      - 'zephyr/**'
+      - 'build-hatsu.yaml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build-hatsu.yaml
+      config_path: config
+      archive_name: hatsu-firmware

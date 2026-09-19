@@ -1,0 +1,9 @@
+if BOARD_HATSU_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "Hatsu Right"
+
+config BT_DEVICE_NAME
+    default "Hatsu Right"
+
+endif # BOARD_HATSU_RIGHT

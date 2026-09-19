@@ -1,0 +1,31 @@
+name: Build Tractyl
+on:
+  push:
+    paths:
+      - 'config/tracktyl.keymap'
+      - 'config/tracktyl_left.keymap'
+      - 'config/tracktyl_right.keymap'
+      - 'config/tracktyl.conf'
+      - 'config/tracktyl_left.conf'
+      - 'config/tracktyl_right.conf'
+      - 'config/boards/shields/tracktyl/**'
+      - 'build-tractyl.yaml'
+  pull_request:
+    paths:
+      - 'config/tracktyl.keymap'
+      - 'config/tracktyl_left.keymap'
+      - 'config/tracktyl_right.keymap'
+      - 'config/tracktyl.conf'
+      - 'config/tracktyl_left.conf'
+      - 'config/tracktyl_right.conf'
+      - 'config/boards/shields/tracktyl/**'
+      - 'build-tractyl.yaml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build-tractyl.yaml
+      config_path: config
+      archive_name: tractyl-firmware

@@ -1,0 +1,12 @@
+if BOARD_HATSU_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "Hatsu Left"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config BT_DEVICE_NAME
+    default "Hatsu Left"
+
+endif # BOARD_HATSU_LEFT

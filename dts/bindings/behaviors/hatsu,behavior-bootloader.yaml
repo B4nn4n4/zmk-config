@@ -1,0 +1,8 @@
+description: |
+  Reboots into the Adafruit UF2 bootloader by writing the DFU magic value
+  directly to GPREGRET and resetting. Used because the Zephyr bootmode
+  retention path does not work reliably on the Hatsu right half.
+
+compatible: "hatsu,behavior-bootloader"
+
+include: zero_param.yaml

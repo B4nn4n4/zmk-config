@@ -1,0 +1,5 @@
+# Corneish Zen v2 — isolated pipeline (stable v0.3)
+---
+include:
+  - board: corneish_zen_v2_left
+  - board: corneish_zen_v2_right

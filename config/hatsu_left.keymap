@@ -1,0 +1,163 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/backlight.h>
+#include <dt-bindings/zmk/pointing.h>
+#include "layouts/alphas.h"
+
+/* Unified layers — shared across boards where possible */
+#define BASE_QWERTY 0
+#define BASE_COLEMAK 1
+#define LOWER 2
+#define RAISE 3
+#define SYSTEM 4
+#define MOUSE 5
+#define GAMING 6
+#define RESERVED 7
+
+/ {
+    behaviors {
+#include "behaviors/homerow.dtsi"
+
+        bat: bat {
+            compatible = "zmk,behavior-battery-indicator";
+            display-name = "Battery Indicator";
+            #binding-cells = <0>;
+        };
+
+        bootl: bootl {
+            compatible = "hatsu,behavior-bootloader";
+            display-name = "Bootloader";
+            #binding-cells = <0>;
+        };
+
+        lc: lc {
+            compatible = "zmk,behavior-layer-color";
+            display-name = "Layer Color Relay";
+            #binding-cells = <0>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        /* 0: QWERTY base — 52-position Hatsu layout */
+        layer_0 {
+            label = "qwerty";
+            bindings = <
+                &kp ESC   &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5  &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5 &none
+                &none  &bhm LSHIFT QW_R2L1  &bhm LALT QW_R2L2  &bhm LGUI QW_R2L3  &bhm LCTRL QW_R2L4  &kp QW_R2L5  &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5 &none
+                &kp BSLH  &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5  &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5 &none
+                                &none &none                                    &kp LBKT &kp RBKT
+                                &lt LOWER SPACE &none                          &lt RAISE BSPC &lt SYSTEM ENTER
+                                &none &none                                    &none &none
+                                &mo SYSTEM &mo RAISE                            &mo MOUSE &mo SYSTEM
+            >;
+        };
+
+        /* 1: Colemak (plain) base — runtime toggle via &tog BASE_COLEMAK on SYSTEM */
+        layer_1 {
+            label = "colemak";
+            bindings = <
+                &kp ESC   &kp CM_R1L1  &kp CM_R1L2  &kp CM_R1L3  &kp CM_R1L4  &kp CM_R1L5  &kp CM_R1R1  &kp CM_R1R2  &kp CM_R1R3  &kp CM_R1R4  &kp CM_R1R5 &none
+                &none  &bhm LSHIFT CM_R2L1  &bhm LALT CM_R2L2  &bhm LGUI CM_R2L3  &bhm LCTRL CM_R2L4  &kp CM_R2L5  &kp CM_R2R1  &bhm LCTRL CM_R2R2  &bhm LGUI CM_R2R3  &bhm LALT CM_R2R4  &bhm LSHIFT CM_R2R5 &none
+                &kp BSLH  &kp CM_R3L1  &kp CM_R3L2  &kp CM_R3L3  &kp CM_R3L4  &kp CM_R3L5  &kp CM_R3R1  &kp CM_R3R2  &kp CM_R3R3  &kp CM_R3R4  &kp CM_R3R5 &none
+                                &none &none                                    &kp LBKT &kp RBKT
+                                &lt LOWER SPACE &none                          &lt RAISE BSPC &lt SYSTEM ENTER
+                                &none &none                                    &none &none
+                                &mo SYSTEM &mo RAISE                            &mo MOUSE &mo SYSTEM
+            >;
+        };
+
+        /* 2: LOWER / NUM — shared F-keys + numbers */
+        layer_2 {
+            label = "num";
+            bindings = <
+                &kp F11 &kp F7  &kp F5  &kp F3  &kp F1  &kp F9  &kp F10  &kp F2  &kp F4  &kp F6  &kp F8 &kp F12
+                &none &bhm LSHIFT N7 &bhm LALT N5 &bhm LGUI N3 &bhm LCTRL N1 &kp N9 &kp N0 &bhm LCTRL N2 &bhm LGUI N4 &bhm LALT N6 &bhm LSHIFT N8 &none
+                &none &kp BSLH &kp SQT &none &none &none &none &kp LBKT &kp RBKT &kp MINUS &kp EQUAL &none
+                                &trans &trans                           &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+            >;
+        };
+
+        /* 3: RAISE / NAV+FUNCTION — unified across boards */
+        layer_3 {
+            label = "raise";
+            bindings = <
+                &none &kp ESC &kp HOME &kp UP &kp END &none &bootloader &tog 6 &none &none &kp DEL &none
+                &none &kp TAB &kp LEFT &kp DOWN &kp RIGHT &none &none &kp LCTRL &kp LGUI &kp LALT &bhm LSHIFT K_CMENU &none
+                &none &none &kp C_PREV &kp C_PP &kp C_NEXT &none &sys_reset &none &none &none &none &none
+                                &trans &trans                           &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+            >;
+        };
+
+        layer_4 {
+            label = "system";
+            bindings = <
+                &bl BL_TOG &bat &sys_reset &bootl &bt BT_CLR &trans               &trans &bt BT_CLR &bootl &sys_reset &bat &bl BL_TOG
+                &bt BT_NXT &tog 1 &tog 0 &trans &trans &trans &trans &trans &trans &trans &trans &trans
+                &bt BT_PRV &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &trans
+                               &trans &trans                                    &trans &trans
+                               &trans &trans                                    &trans &trans
+                               &trans &trans                                    &trans &trans
+                               &trans &trans                                    &trans &trans
+            >;
+        };
+
+        layer_5 {
+            label = "mouse";
+            bindings = <
+                &trans &trans &trans &trans &trans &trans               &mkp LCLK &mkp MCLK &mkp RCLK &trans &trans &trans
+                &trans &trans &trans &trans &trans &trans               &mmv MOVE_LEFT &mmv MOVE_DOWN &mmv MOVE_UP &mmv MOVE_RIGHT &trans &trans
+                &trans &trans &trans &trans &trans &trans               &msc SCRL_LEFT &msc SCRL_DOWN &msc SCRL_UP &msc SCRL_RIGHT &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+            >;
+        };
+
+        layer_6 {
+            label = "gaming";
+            bindings = <
+                &none &kp ESC &kp Q &kp W &kp E &kp R            &kp Y &kp U &kp I &kp O &kp P &none
+                &none &kp TAB &kp A &kp S &kp D &kp F      &kp H &kp J &kp K &kp L &kp SEMICOLON &none
+                &none &none &kp Z &kp X &kp C &kp V          &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &none
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &tog 0 &trans
+            >;
+        };
+
+        layer_7 {
+            label = "reserved";
+            bindings = <
+                &trans &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &trans
+                &trans &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &trans
+                &trans &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+                                &trans &trans                            &trans &trans
+            >;
+        };
+    };
+
+    chosen {
+        zmk,layer-colors = &layer_colors;
+    };
+
+    layer_colors: layer_colors {
+        compatible = "zmk,layer-colors";
+        /* 0:qwerty black 1:colemak cyan 2:num magenta 3:raise orange 4:system blue 5:mouse yellow 6:gaming green 7:reserved black */
+        colors = <0x000000 0x00FF00 0x00FFFF 0xFF8000 0x0000FF 0xFFFF00 0x00FF88 0x000000>;
+    };
+};

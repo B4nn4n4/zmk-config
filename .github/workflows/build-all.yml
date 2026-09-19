@@ -1,0 +1,26 @@
+name: Build All
+# Unified trigger for central changes — builds every board
+on:
+  push:
+    paths:
+      - 'config/layouts/**'
+      - 'config/behaviors/**'
+      - 'config/west.yml'
+      - 'build.yaml'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'config/layouts/**'
+      - 'config/behaviors/**'
+      - 'config/west.yml'
+      - 'build.yaml'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build.yaml
+      config_path: config
+      archive_name: firmware

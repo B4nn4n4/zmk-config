@@ -1,0 +1,6 @@
+# Manual reset builds — run via Actions > Build Reset > Run workflow
+# Previously included as automatic settings_reset in build.yaml/build-tractyl.yaml
+---
+include:
+  - board: nice_nano_v2
+    shield: settings_reset

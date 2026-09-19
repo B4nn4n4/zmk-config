@@ -1,0 +1,21 @@
+name: Build Zen
+on:
+  push:
+    paths:
+      - 'config/corneish_zen.keymap'
+      - 'config/corneish_zen.conf'
+      - 'build-zen.yaml'
+  pull_request:
+    paths:
+      - 'config/corneish_zen.keymap'
+      - 'config/corneish_zen.conf'
+      - 'build-zen.yaml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build-zen.yaml
+      config_path: config
+      archive_name: zen-firmware

@@ -1,0 +1,5 @@
+description: Relays layer indicator colors across split halves
+
+compatible: "zmk,behavior-layer-color"
+
+include: zero_param.yaml

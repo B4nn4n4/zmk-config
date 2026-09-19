@@ -1,0 +1,11 @@
+zephyr_include_directories(include)
+
+add_subdirectory(drivers)
+
+target_sources_ifdef(CONFIG_ZMK_BACKLIGHT_MAP app PRIVATE src/backlight.c)
+target_sources_ifdef(CONFIG_ZMK_BACKLIGHT_MAP app PRIVATE src/behaviors/behavior_backlight.c)
+target_sources(app PRIVATE src/behaviors/behavior_bootloader.c)
+target_sources_ifdef(CONFIG_ZMK_BATTERY_INDICATOR app PRIVATE src/battery_indicator.c)
+target_sources_ifdef(CONFIG_ZMK_BATTERY_INDICATOR app PRIVATE src/behaviors/behavior_battery_indicator.c)
+target_sources_ifdef(CONFIG_ZMK_BATTERY_INDICATOR app PRIVATE src/behaviors/behavior_layer_color.c)
+target_sources_ifdef(CONFIG_ZMK_BOOT_MAGIC_KEY app PRIVATE src/boot_magic_key.c)

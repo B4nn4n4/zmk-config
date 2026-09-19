@@ -1,0 +1,116 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/backlight.h>
+#include <dt-bindings/zmk/mouse.h>
+#include <dt-bindings/zmk/pointing.h>
+#include "layouts/alphas.h"
+
+#define BASE_QWERTY 0
+#define BASE_COLEMAK 1
+#define LOWER 2
+#define RAISE 3
+#define SYSTEM 4
+#define MOUSE 5
+#define GAMING 6
+#define RESERVED 7
+
+/ {
+    chosen {
+        zmk,matrix_transform = &default_transform;
+    };
+};
+
+/ {
+    behaviors {
+#include "behaviors/homerow.dtsi"
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        /* 0: QWERTY — unified base */
+        layer_0 {
+            label = "qwerty";
+            bindings = <
+                &none  &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5  &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5 &none
+                &none  &bhm LSHIFT QW_R2L1  &bhm LALT QW_R2L2  &bhm LGUI QW_R2L3  &bhm LCTRL QW_R2L4  &kp QW_R2L5  &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5 &none
+                &none  &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5  &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5 &none
+                                                                        &none &none &lt LOWER SPACE  &lt RAISE BSPC  &kp ENTER &none
+            >;
+        };
+
+        /* 1: Colemak plain — toggle from SYSTEM */
+        layer_1 {
+            label = "colemak";
+            bindings = <
+                &none  &kp CM_R1L1  &kp CM_R1L2  &kp CM_R1L3  &kp CM_R1L4  &kp CM_R1L5  &kp CM_R1R1  &kp CM_R1R2  &kp CM_R1R3  &kp CM_R1R4  &kp CM_R1R5 &none
+                &none  &bhm LSHIFT CM_R2L1  &bhm LALT CM_R2L2  &bhm LGUI CM_R2L3  &bhm LCTRL CM_R2L4  &kp CM_R2L5  &kp CM_R2R1  &bhm LCTRL CM_R2R2  &bhm LGUI CM_R2R3  &bhm LALT CM_R2R4  &bhm LSHIFT CM_R2R5 &none
+                &none  &kp CM_R3L1  &kp CM_R3L2  &kp CM_R3L3  &kp CM_R3L4  &kp CM_R3L5  &kp CM_R3R1  &kp CM_R3R2  &kp CM_R3R3  &kp CM_R3R4  &kp CM_R3R5 &none
+                                                                        &none &none &lt LOWER SPACE  &lt RAISE BSPC  &kp ENTER &none
+            >;
+        };
+
+        /* 2: LOWER / NUM — shared */
+        layer_2 {
+            label = "num";
+            bindings = <
+                &none  &kp F6  &kp F4  &kp F2  &kp F10  &none    &none  &kp F1  &kp F3  &kp F5  &kp F7 &none
+                &none  &bhm LSHIFT N6 &bhm LALT N4 &bhm LGUI N2 &bhm LCTRL N0 &kp N8  &kp N9 &bhm LCTRL N1 &bhm LGUI N3 &bhm LALT N5 &bhm LSHIFT N7 &none
+                &none  &kp BSLH &kp SQT &none &none &none   &none &kp LBKT &kp RBKT &kp MINUS &kp EQUAL &none
+                                                                        &none &none &none &kp BSPC &none &none
+            >;
+        };
+
+        /* 3: RAISE / NAV */
+        layer_3 {
+            label = "raise";
+            bindings = <
+                &none  &kp ESC &kp HOME &kp UP &kp END &kp PLUS    &none &none &none &none &kp DEL &none
+                &none  &kp TAB &kp LEFT &kp DOWN &kp RIGHT &kp MINUS   &none &kp LCTRL &kp LGUI &kp LALT &bhm LSHIFT K_CMENU &none
+                &none  &none &kp C_PREV &kp C_PP &kp C_NEXT &none   &none &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_CLR
+                                                                        &none &none &kp SPACE &none &none &none
+            >;
+        };
+
+        layer_4 {
+            label = "system";
+            bindings = <
+                &none  &bt BT_CLR &tog 0 &tog 1 &none &none   &none &none &none &none &bt BT_CLR &none
+                &none  &bt BT_NXT &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans &none
+                &none  &bt BT_PRV &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans &none
+                                                                        &trans &trans &trans &trans &trans &trans
+            >;
+        };
+
+        layer_5 {
+            label = "mouse";
+            bindings = <
+                &none  &trans &trans &trans &trans &trans   &mkp LCLK &mkp MCLK &mkp RCLK &trans &trans &trans
+                &none  &trans &trans &trans &trans &trans   &mmv MOVE_LEFT &mmv MOVE_DOWN &mmv MOVE_UP &mmv MOVE_RIGHT &trans &trans
+                &none  &trans &trans &trans &trans &trans   &msc SCRL_LEFT &msc SCRL_DOWN &msc SCRL_UP &msc SCRL_RIGHT &trans &trans
+                                                                        &trans &trans &trans &trans &trans &trans
+            >;
+        };
+
+        layer_6 {
+            label = "gaming";
+            bindings = <
+                &none  &kp ESC &kp Q &kp W &kp E &kp R   &kp Y &kp U &kp I &kp O &kp P &none
+                &none  &kp TAB &kp A &kp S &kp D &kp F   &kp H &kp J &kp K &kp L &kp SEMI &none
+                &none  &none &kp Z &kp X &kp C &kp V   &kp N &kp M &kp CMMA &kp DOT &kp FSLH &none
+                                                                        &trans &trans &trans &trans &trans &trans
+            >;
+        };
+
+        layer_7 {
+            label = "reserved";
+            bindings = <
+                &none  &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans &none
+                &none  &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans &none
+                &none  &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans &none
+                                                                        &trans &trans &trans &trans &trans &trans
+            >;
+        };
+    };
+};

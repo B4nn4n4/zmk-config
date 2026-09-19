@@ -1,0 +1,48 @@
+
+CONFIG_RETAINED_MEM=y
+CONFIG_RETENTION=y
+CONFIG_RETENTION_BOOT_MODE=y
+
+CONFIG_ZMK_BLE=y
+CONFIG_ZMK_USB=y
+CONFIG_ZMK_SPLIT=y
+
+CONFIG_I2C=y
+
+# Enable MPU
+CONFIG_ARM_MPU=y
+
+# Use pinctrl
+CONFIG_PINCTRL=y
+
+# enable GPIO
+CONFIG_GPIO=y
+
+# SoftDevice-free nRF52840 with Adafruit UF2 bootloader
+CONFIG_USE_DT_CODE_PARTITION=y
+CONFIG_BUILD_OUTPUT_UF2=y
+
+# Settings storage (bonds, backlight state) -- required on BOTH halves
+CONFIG_MPU_ALLOW_FLASH_WRITE=y
+CONFIG_NVS=y
+CONFIG_SETTINGS=y
+CONFIG_SETTINGS_NVS=y
+CONFIG_FLASH=y
+CONFIG_FLASH_PAGE_LAYOUT=y
+CONFIG_FLASH_MAP=y
+
+CONFIG_ZMK_BOOT_MAGIC_KEY=y
+
+CONFIG_ZMK_BACKLIGHT_MAP=y
+
+# Stay awake while USB/charging is present so the host never deasserts VBUS;
+# deep sleep only happens when unplugged. Qi charging is not detected by ZMK
+# (zmk_usb_is_powered() is the only power source check) but Qi still charges
+# during deep sleep via the hardware receiver.
+CONFIG_ZMK_SLEEP=y
+
+CONFIG_ZMK_BATTERY_INDICATOR=y
+CONFIG_ZMK_BATTERY_INDICATOR_COLOR=0x00FF00
+
+CONFIG_ZMK_BATTERY_REPORTING=y
+CONFIG_ZMK_BATTERY_REPORTING_FETCH_MODE_LITHIUM_VOLTAGE=y

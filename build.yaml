@@ -1,0 +1,12 @@
+# Unified build — all boards (stable v0.3) — Hatsu excluded (HWMv2 only on main)
+# See https://zmk.dev/docs/customization#building-additional-keyboards
+---
+include:
+  # Corneish Zen v2
+  - board: corneish_zen_v2_left
+  - board: corneish_zen_v2_right
+  # Tractyl (nice_nano_v2 + shield)
+  - board: nice_nano_v2
+    shield: tracktyl_left
+  - board: nice_nano_v2
+    shield: tracktyl_right

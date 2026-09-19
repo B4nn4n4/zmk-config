@@ -1,0 +1,66 @@
+menu "ZMK Hatsu Module"
+
+config ZMK_BACKLIGHT_MAP
+    bool "LED backlight with LED channel mapping"
+    select LED
+
+if ZMK_BACKLIGHT_MAP
+
+config ZMK_BACKLIGHT_BRT_STEP
+    int "Brightness step in percent"
+    range 1 100
+    default 20
+
+config ZMK_BACKLIGHT_BRT_START
+    int "Default brightness in percent"
+    range 1 100
+    default 40
+
+config ZMK_BACKLIGHT_ON_START
+    bool "Backlight on at boot"
+    default y
+
+config ZMK_BACKLIGHT_AUTO_OFF_IDLE
+    bool "Turn off backlight when keyboard goes into idle state"
+
+config ZMK_BACKLIGHT_AUTO_OFF_USB
+    bool "Turn off backlight when USB is disconnected"
+
+endif # ZMK_BACKLIGHT_MAP
+
+config ZMK_BATTERY_INDICATOR
+    bool "Enable RGB battery indicator"
+
+config ZMK_BATTERY_INDICATOR_DURATION
+    int "Battery indicator duration in seconds"
+    default 5
+
+config ZMK_BATTERY_INDICATOR_COLOR
+    hex "Battery indicator color, when indicating, as hex 0xRRGGBB"
+    default 0x00FF00
+
+config ZMK_BATTERY_INDICATOR_LOW_THRESHOLD
+    int "State of charge percent below which the indicator shows solid red"
+    default 20
+
+config ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
+    int "State of charge percent at or above which the indicator shows a solid full bar"
+    default 80
+
+config ZMK_BATTERY_INDICATOR_CHARGING
+    bool "Pulse the battery bar while USB power is connected"
+    default y
+
+DT_COMPAT_ZMK_BOOT_MAGIC_KEY := zmk,boot-magic-key
+
+config ZMK_BOOT_MAGIC_KEY
+    bool "Enable actions when keys are held at boot"
+    default $(dt_compat_enabled,$(DT_COMPAT_ZMK_BOOT_MAGIC_KEY))
+
+config ZMK_BOOT_MAGIC_KEY_TIMEOUT_MS
+    int "Milliseconds to wait for a boot magic key at startup"
+    default 500
+
+rsource "drivers/Kconfig"
+
+endmenu
