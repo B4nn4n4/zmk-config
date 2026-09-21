@@ -1,7 +1,8 @@
-# Tractyl (nice_nano_v2 + tracktyl shields) — isolated pipeline (stable v0.3)
+# Tractyl (nice_nano + tracktyl shields) — isolated pipeline (upstream main)
+# HWMv2: nice_nano defaults to rev 2.0.0 = v2 hardware.
 ---
 include:
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: tracktyl_left
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: tracktyl_right

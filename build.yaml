@@ -1,12 +1,13 @@
-# Unified build — all boards (stable v0.3) — Hatsu excluded (HWMv2 only on main)
+# Unified build — Zen + Tractyl (upstream main).
+# Hatsu has its own pipeline (build-hatsu.yaml: HWMv2 custom boards + Studio snippet).
 # See https://zmk.dev/docs/customization#building-additional-keyboards
 ---
 include:
-  # Corneish Zen v2
-  - board: corneish_zen_v2_left
-  - board: corneish_zen_v2_right
-  # Tractyl (nice_nano_v2 + shield)
-  - board: nice_nano_v2
+  # Corneish Zen v2 (HWMv2 IDs default to rev 2.0.0 = v2 hardware)
+  - board: corneish_zen_left//zmk
+  - board: corneish_zen_right//zmk
+  # Tractyl (nice_nano defaults to rev 2.0.0 = v2 hardware)
+  - board: nice_nano//zmk
     shield: tracktyl_left
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: tracktyl_right

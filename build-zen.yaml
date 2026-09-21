@@ -1,5 +1,6 @@
-# Corneish Zen v2 — isolated pipeline (stable v0.3)
+# Corneish Zen v2 — isolated pipeline (upstream main)
+# HWMv2 board IDs: corneish_zen_left/right default to rev 2.0.0 = v2 hardware.
 ---
 include:
-  - board: corneish_zen_v2_left
-  - board: corneish_zen_v2_right
+  - board: corneish_zen_left//zmk
+  - board: corneish_zen_right//zmk

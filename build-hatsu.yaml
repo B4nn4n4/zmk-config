@@ -1,3 +1,12 @@
-# Hatsu — disabled on stable v0.3 (HWMv2 only on main)
+# Hatsu — upstream ZMK main (Zephyr 4.1, HWMv2)
+# Left is central: Studio RPC snippet only there; conf enables CONFIG_ZMK_STUDIO.
+# settings_reset images wipe the split pairing when bonds are stuck.
 ---
-include: []
+include:
+  - board: hatsu_left//zmk
+    snippet: studio-rpc-usb-uart
+  - board: hatsu_right//zmk
+  - board: hatsu_left//zmk
+    shield: settings_reset
+  - board: hatsu_right//zmk
+    shield: settings_reset
