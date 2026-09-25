@@ -16,9 +16,9 @@ Unified ZMK config for **3 keyboards × 2 base layouts** — Hatsu / Corneish Ze
 - `config/behaviors/homerow.dtsi` — single `bhm` 200 ms balanced hold-tap (included via `#include`).
 - `config/west.yml` — `zmk@main` + `zmk-pmw3610-driver@main` for Tractyl trackball.
 
-Base layers (runtime toggle, not separate UF2s):
-- `0 BASE_QWERTY`, `1 BASE_COLEMAK` (plain: `Q W F P G / A R S T D`), `2 LOWER/NUM`, `3 RAISE/NAV`, `4 SYSTEM`, `5 MOUSE`, `6 GAMING/FUSION`, `7 RESERVED`
-- Toggle: **SYSTEM layer** → `&tog BASE_COLEMAK` / `&tog BASE_QWERTY` (Hatsu: `BT_NXT` row; Zen/Tractyl SYSTEM likewise). Future: save via `CONFIG_ZMK_STUDIO` or combo.
+Base layers (default Colemak, runtime toggle, not separate UF2s):
+- `0 BASE_COLEMAK` (plain: `Q W F P G / A R S T D`), `1 BASE_QWERTY`, `2 LOWER/NUM`, `3 RAISE/NAV`, `4 SYSTEM`, `5 MOUSE`, `6 GAMING`, `7 FUSION`
+- Flip QWERTY↔Colemak live via outer `Q+P` chord (`&tog` flip-flop) or **SYSTEM layer** `&tog` keys; reboot always returns to Colemak (runtime-only, nothing persisted). Hatsu shows white while on QWERTY.
 
 Other shared: `NUM` F-keys/numbers, `NAV` arrows/media, `SYSTEM` BT, `MOUSE` `&mkp/&mmv/&msc`. Tractyl retains `trackball_listener` + combos; Hatsu retains `bat`/`bootl`/`lc` layer-color relay.
 

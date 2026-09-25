@@ -39,6 +39,8 @@ CONFIG_ZMK_BACKLIGHT_MAP=y
 # (zmk_usb_is_powered() is the only power source check) but Qi still charges
 # during deep sleep via the hardware receiver.
 CONFIG_ZMK_SLEEP=y
+# Idle sleep timeout unified across boards (1h, same as Zen)
+CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=3600000
 
 CONFIG_ZMK_BATTERY_INDICATOR=y
 CONFIG_ZMK_BATTERY_INDICATOR_COLOR=0x00FF00
