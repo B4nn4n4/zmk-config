@@ -22,6 +22,61 @@ Base layers (default Colemak, runtime toggle, not separate UF2s):
 
 Other shared: `NUM` F-keys/numbers, `NAV` arrows/media, `SYSTEM` BT, `MOUSE` `&mkp/&mmv/&msc`. Tractyl retains `trackball_listener` + combos; Hatsu retains `bat`/`bootl`/`lc` layer-color relay.
 
+## Keymap overview
+
+> Interactive version (rendered HTML): [`keymap_overview.html`](https://b4nn4n4.github.io/zmk-config/keymap_overview.html) via GitHub Pages.
+> GitHub strips `<script>`/`<style>` from READMEs, so the layer graphics below are embedded SVGs generated from the same data (thumb clusters sit under their respective half).
+> Legend: `·` = no key, `▽` = transparent (fall through to lower layer), `KEY (hold)` = tap KEY / hold MOD or layer, `mo` / `tog` / `TO` = momentary / toggle / jump-to layer.
+
+<!-- KEYMAP-OVERVIEW-START -->
+
+### Hatsu · 52 keys
+Source: `config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 4 combos`
+
+**Combos (Hatsu · 52 keys)** — all 50 ms timeout
+
+| Name | Keys (pos) | Output | Note |
+|---|---|---|---|
+| `combo_esc` | 0 + 1 | `ESC` | top-left two keys |
+| `combo_base_flip` | 1 + 10 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
+| `combo_bootload` | 44 + 47 | `&bootl (UF2)` | hidden thumb chord (both ∅ on base layers) |
+| `combo_sysreset` | 45 + 46 | `&sys_reset` | hidden thumb chord (both ∅ on base layers) |
+
+![Layer overview — Hatsu · 52 keys](docs/keymap-hatsu.svg)
+
+### Corneish Zen · 42 keys
+Source: `config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 4 combos`
+
+**Combos (Corneish Zen · 42 keys)** — all 50 ms timeout
+
+| Name | Keys (pos) | Output | Note |
+|---|---|---|---|
+| `combo_esc` | 1 + 2 | `ESC` | Q + W |
+| `combo_base_flip` | 1 + 10 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
+| `combo_bootload` | 0 + 11 | `&bootloader` | outer top-row ∅ pair |
+| `combo_sysreset` | 12 + 23 | `&sys_reset` | outer homerow ∅ pair |
+
+![Layer overview — Corneish Zen · 42 keys](docs/keymap-zen.svg)
+
+### Tractyl · 33 keys
+Source: `config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 6 combos`
+
+**Combos (Tractyl · 33 keys)** — all 50 ms timeout
+
+| Name | Keys (pos) | Output | Note |
+|---|---|---|---|
+| `combo_esc` | 0 + 1 | `ESC` | Q + W |
+| `combo_middleclick` | 12 + 13 | `&mlt 2 MCLK (tap MCLK / hold MOUSE)` | homerow S+T position pair |
+| `combo_middlepress` | 16 + 17 | `&mkp MCLK` | N+E position pair |
+| `combo_bootload` | 0 + 30 | `&bootloader` | Q + LOWER/Space thumb |
+| `combo_sysreset` | 0 + 24 | `&sys_reset` | Q + B |
+| `combo_base_flip` | 0 + 9 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
+
+![Layer overview — Tractyl · 33 keys](docs/keymap-tractyl.svg)
+
+
+<!-- KEYMAP-OVERVIEW-END -->
+
 ## Build pipelines (4 workflows)
 
 - `build-hatsu.yml` → `build-hatsu.yaml` — triggers on `config/hatsu*`, `boards/**`, `dts/**`, `drivers/**`, `src/**`

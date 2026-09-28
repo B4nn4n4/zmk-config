@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keymap — Layer &amp; Combo Overview (Hatsu / Zen / Tractyl)</title>
+<style>
+  :root { --bg:#111318; --panel:#1a1e27; --ink:#e8eaf0; --dim:#9aa1b2; --line:#2a3040; --kw:78px; --kh:56px; }
+  * { box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; margin:0; padding:24px; }
+  header { max-width:1100px; margin:0 auto 12px; }
+  h1 { margin:0 0 4px; font-size:22px; }
+  p.sub { margin:0; color:var(--dim); font-size:13px; }
+  .tabs { max-width:1100px; margin:12px auto; display:flex; gap:8px; }
+  .tabs button { flex:1; cursor:pointer; font-size:14px; font-weight:650; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; }
+  .tabs button.active { background:#2b3554; border-color:#4a5a8a; }
+  main { max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:18px; }
+  section.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  section.card h2 { margin:0 0 2px; font-size:16px; display:flex; align-items:center; gap:10px; }
+  .dot { width:12px; height:12px; border-radius:50%; display:inline-block; border:1px solid #0008; }
+  .meta { color:var(--dim); font-size:12px; margin:0 0 12px; }
+  .kb { display:flex; flex-direction:column; gap:6px; }
+  .row { display:grid; gap:6px; }
+  .row.r6 { grid-template-columns:repeat(6,var(--kw)); }
+  .row.r5 { grid-template-columns:repeat(5,var(--kw)); }
+  .split { display:grid; grid-template-columns:auto 64px auto; justify-content:center; align-items:start; }
+  .half { display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .mid { border-left:1px dashed var(--line); align-self:stretch; margin-left:31px; }
+  .throw { display:grid; gap:6px; }
+  .throw.c6 { grid-template-columns:repeat(6,var(--kw)); }
+  .throw.c5 { grid-template-columns:repeat(5,var(--kw)); }
+  .key { border:1px solid var(--line); border-radius:8px; background:#222839; width:var(--kw); height:var(--kh); padding:4px 5px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; overflow:hidden; }
+  .key .t { font-weight:650; font-size:13px; line-height:1.15; }
+  .key .h { font-size:10px; color:var(--dim); line-height:1.2; }
+  .key .pos { position:absolute; top:2px; left:5px; font-size:9px; color:#6b7386; }
+  .key.hold { border-style:dashed; }
+  .key.lt { background:#2a2440; }
+  .key.mo, .key.tog, .key.to { background:#3a2f14; }
+  .key.trans { opacity:.45; }
+  .key.none { opacity:.28; background:transparent; border-style:dotted; }
+  .key.sys { background:#14305e; }
+  .key.combo-hi { outline:2px solid #ff5252; outline-offset:1px; }
+  .legend { display:flex; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--dim); margin-top:10px; }
+  .legend b { color:var(--ink); }
+  table.combos { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  table.combos th, table.combos td { border:1px solid var(--line); padding:7px 9px; text-align:left; }
+  table.combos th { background:#222839; font-size:12px; color:var(--dim); }
+  table.combos tr { cursor:pointer; }
+  table.combos tr:hover, table.combos tr.active { background:#262d42; }
+  code { background:#0d1017; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:12px; }
+  footer { max-width:1100px; margin:16px auto; color:var(--dim); font-size:12px; }
+  @media (max-width:760px){ .key{width:auto;height:auto;min-height:44px} .key .t{font-size:11px} .split{grid-template-columns:1fr 28px 1fr} .mid{margin-left:13px} .row.r6,.throw.c6{grid-template-columns:repeat(6,1fr)} .row.r5,.throw.c5{grid-template-columns:repeat(5,1fr)} }
+  @media print { body{background:#fff;color:#000} section.card{background:#fff;border-color:#ccc;break-inside:avoid} .key{background:#fff!important;color:#000;border-color:#999} .key .h,.meta,.legend{color:#444} .tabs{display:none} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Keymap — Layer &amp; Combo Overview</h1>
+  <p class="sub" id="src-line"></p>
+</header>
+<div class="tabs" id="tabs"></div>
+<main id="app"></main>
+<footer>Corner numbers are ZMK key-position indices. Layer colors exist only on Hatsu (physical RGB via the <code>layer_colors</code> node in <code>hatsu_left.keymap</code>).</footer>
+<script>
+function K(t,h,c){ return {t:t,h:h||"",c:c||""}; }
+const NONE = K("∅","","none"), TRANS = K("▽","","trans");
+const LAYER_COLORS = ["#00FF00","#FFFFFF","#00FFFF","#FF8000","#0000FF","#FFFF00","#00FF88","#FF00FF"];
+const LAYER_META = [
+ {label:"0 · Colemak (default base)", desc:"Default on boot. Base-flip chord or SYSTEM &tog switches to QWERTY (runtime only)."},
+ {label:"1 · QWERTY (toggle base)", desc:"Same geometry, QWERTY legends. Reboot returns to Colemak."},
+ {label:"2 · LOWER / NUM", desc:"F-keys row + numbers on homerow (hold-tap mods kept)."},
+ {label:"3 · RAISE / NAV", desc:"Arrows/media/BT + toggles into GAMING (6) and FUSION (7)."},
+ {label:"4 · SYSTEM", desc:"BT / bootloader / sys_reset / base toggles."},
+ {label:"5 · MOUSE", desc:"Mouse keys; geometry differs per board (see notes)."},
+ {label:"6 · GAMING", desc:"Mods-free (Hatsu/Zen) or custom (Tractyl) gaming layout."},
+ {label:"7 · FUSION", desc:"QWERTY + homerow mods; A is balanced mouserow mod (tap A / hold MCLK)."},
+];
+// ── HATSU (52) ──
+const HATSU = {
+ colemak: [
+  K("ESC"),K("Q"),K("W"),K("F"),K("P"),K("G"),K("J"),K("L"),K("U"),K("Y"),K(";"),NONE,
+  NONE,K("A","⇧ hold","hold"),K("R","⌥ hold","hold"),K("S","⌘ hold","hold"),K("T","⌃ hold","hold"),K("D"),K("H"),K("N","⌃ hold","hold"),K("E","⌘ hold","hold"),K("I","⌥ hold","hold"),K("O","⇧ hold","hold"),NONE,
+  K("\\"),K("Z"),K("X"),K("C"),K("V"),K("B"),K("K"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("["),K("]"),
+  K("Space","hold LOWER","lt"),NONE,K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt"),
+  NONE,NONE,NONE,NONE,
+  K("SYSTEM","mo","mo"),K("RAISE","mo","mo"),K("MOUSE","mo","mo"),K("SYSTEM","mo","mo")],
+ qwerty: [
+  K("ESC"),K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("A","⇧ hold","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),NONE,
+  K("\\"),K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("["),K("]"),
+  K("Space","hold LOWER","lt"),NONE,K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt"),
+  NONE,NONE,NONE,NONE,
+  K("SYSTEM","mo","mo"),K("RAISE","mo","mo"),K("MOUSE","mo","mo"),K("SYSTEM","mo","mo")],
+ num: [
+  K("F11"),K("F7"),K("F5"),K("F3"),K("F1"),K("F9"),K("F10"),K("F2"),K("F4"),K("F6"),K("F8"),K("F12"),
+  NONE,K("7","⇧ hold","hold"),K("5","⌥ hold","hold"),K("3","⌘ hold","hold"),K("1","⌃ hold","hold"),K("9"),K("0"),K("2","⌃ hold","hold"),K("4","⌘ hold","hold"),K("6","⌥ hold","hold"),K("8","⇧ hold","hold"),NONE,
+  NONE,K("\\"),K("'"),NONE,NONE,NONE,NONE,K("["),K("]"),K("-"),K("="),NONE,
+  TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS],
+ raise: [
+  NONE,K("ESC"),K("Home"),K("Up"),K("End"),NONE,K("⏻ BL","bootloader","sys"),K("tog 6","GAMING","mo"),K("tog 7","FUSION","mo"),NONE,K("Del"),NONE,
+  NONE,K("Tab"),K("←"),K("↓"),K("→"),NONE,NONE,K("LCtrl"),K("LGui"),K("LAlt"),K("Menu","⇧ hold","hold"),NONE,
+  NONE,NONE,K("⏮"),K("⏯"),K("⏭"),NONE,K("sys_reset","","sys"),K("BT 1","BT_SEL 0","sys"),K("BT 2","BT_SEL 1","sys"),K("BT 3","BT_SEL 2","sys"),K("BT 4","BT_SEL 3","sys"),K("BT_CLR","","sys"),
+  TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS],
+ system: [
+  K("BL_TOG","","sys"),K("BAT","","sys"),K("sys_reset","","sys"),K("BOOTL","","sys"),K("BT_CLR","","sys"),TRANS,TRANS,K("BT_CLR","","sys"),K("BOOTL","","sys"),K("sys_reset","","sys"),K("BAT","","sys"),K("BL_TOG","","sys"),
+  K("BT_NXT","","sys"),K("tog 1","→QWERTY","mo"),K("tog 0","→COLEMAK","mo"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,
+  K("BT_PRV","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,
+  TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS],
+ mouse: [
+  TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,K("LCLK"),K("MCLK"),K("RCLK"),TRANS,TRANS,TRANS,
+  TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,K("← move"),K("↓ move"),K("↑ move"),K("→ move"),TRANS,TRANS,
+  TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,K("Scr ←"),K("Scr ↓"),K("Scr ↑"),K("Scr →"),TRANS,TRANS,
+  TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS],
+ gaming: [
+  NONE,K("ESC"),K("Q"),K("W"),K("E"),K("R"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("Tab"),K("A"),K("S"),K("D"),K("F"),K("H"),K("J"),K("K"),K("L"),K(";"),NONE,
+  NONE,NONE,K("Z"),K("X"),K("C"),K("V"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,TRANS,TRANS, TRANS,TRANS,K("TO 0","→colemak","mo"),TRANS],
+ fusion: [
+  NONE,K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("A","hold MCLK","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),NONE,
+  NONE,K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("["),K("]"),
+  K("Space","hold LOWER","lt"),NONE,K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt"),
+  NONE,NONE,NONE,NONE,
+  K("SYSTEM","mo","mo"),K("RAISE","mo","mo"),K("MOUSE","mo","mo"),K("SYSTEM","mo","mo")]
+};
+const HATSU_COMBOS = [
+ {name:"combo_esc", keys:[0,1], out:"ESC", timeout:"50 ms", note:"top-left two keys"},
+ {name:"combo_base_flip", keys:[1,10], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"},
+ {name:"combo_bootload", keys:[44,47], out:"&bootl (UF2)", timeout:"50 ms", note:"hidden thumb chord (both ∅ on base layers)"},
+ {name:"combo_sysreset", keys:[45,46], out:"&sys_reset", timeout:"50 ms", note:"hidden thumb chord (both ∅ on base layers)"}
+];
+// ── ZEN (42: 3×12 + 6 thumbs) ──
+const ZEN = {
+ colemak: [
+  NONE,K("Q"),K("W"),K("F"),K("P"),K("G"),K("J"),K("L"),K("U"),K("Y"),K(";"),NONE,
+  NONE,K("A","⇧ hold","hold"),K("R","⌥ hold","hold"),K("S","⌘ hold","hold"),K("T","⌃ hold","hold"),K("D"),K("H"),K("N","⌃ hold","hold"),K("E","⌘ hold","hold"),K("I","⌥ hold","hold"),K("O","⇧ hold","hold"),NONE,
+  NONE,K("Z"),K("X"),K("C"),K("V"),K("B"),K("K"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter"),NONE],
+ qwerty: [
+  NONE,K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("A","⇧ hold","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),NONE,
+  NONE,K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter"),NONE],
+ num: [
+  NONE,K("F7"),K("F5"),K("F3"),K("F1"),K("F9"),K("F10"),K("F2"),K("F4"),K("F6"),K("F8"),NONE,
+  NONE,K("7","⇧ hold","hold"),K("5","⌥ hold","hold"),K("3","⌘ hold","hold"),K("1","⌃ hold","hold"),K("9"),K("0"),K("2","⌃ hold","hold"),K("4","⌘ hold","hold"),K("6","⌥ hold","hold"),K("8","⇧ hold","hold"),NONE,
+  NONE,K("\\"),K("'"),NONE,NONE,NONE,NONE,K("["),K("]"),K("-"),K("="),NONE,
+  NONE,NONE,NONE,K("Bksp"),NONE,NONE],
+ raise: [
+  NONE,K("ESC"),K("Home"),K("Up"),K("End"),K("+"),K("tog 6","GAMING","mo"),K("tog 7","FUSION","mo"),NONE,NONE,K("Del"),NONE,
+  NONE,K("Tab"),K("←"),K("↓"),K("→"),K("-"),NONE,K("LCtrl"),K("LGui"),K("LAlt"),K("Menu","⇧ hold","hold"),NONE,
+  NONE,NONE,K("⏮"),K("⏯"),K("⏭"),NONE,NONE,K("BT 1","BT_SEL 0","sys"),K("BT 2","BT_SEL 1","sys"),K("BT 3","BT_SEL 2","sys"),K("BT 4","BT_SEL 3","sys"),K("BT_CLR","","sys"),
+  NONE,NONE,K("Space"),NONE,NONE,NONE],
+ system: [
+  NONE,K("BT_CLR","","sys"),K("tog 0","→COLEMAK","mo"),K("tog 1","→QWERTY","mo"),K("⏻ BL","bootloader","sys"),K("sys_reset","","sys"),NONE,NONE,NONE,NONE,K("BT_CLR","","sys"),NONE,
+  NONE,K("BT_NXT","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,NONE,
+  NONE,K("BT_PRV","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,NONE,
+  TRANS,TRANS,TRANS,TRANS,TRANS,TRANS],
+ mouse: [
+  NONE,TRANS,TRANS,TRANS,TRANS,TRANS,K("LCLK"),K("MCLK"),K("RCLK"),TRANS,TRANS,TRANS,
+  NONE,TRANS,TRANS,TRANS,TRANS,TRANS,K("← move"),K("↓ move"),K("↑ move"),K("→ move"),TRANS,TRANS,
+  NONE,TRANS,TRANS,TRANS,TRANS,TRANS,K("Scr ←"),K("Scr ↓"),K("Scr ↑"),K("Scr →"),TRANS,TRANS,
+  TRANS,TRANS,TRANS,TRANS,TRANS,TRANS],
+ gaming: [
+  NONE,K("ESC"),K("Q"),K("W"),K("E"),K("R"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("Tab"),K("A"),K("S"),K("D"),K("F"),K("H"),K("J"),K("K"),K("L"),K(";"),NONE,
+  NONE,NONE,K("Z"),K("X"),K("C"),K("V"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  TRANS,TRANS,TRANS,TRANS,K("TO 0","→colemak","mo"),TRANS],
+ fusion: [
+  NONE,K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),NONE,
+  NONE,K("A","hold MCLK","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),NONE,
+  NONE,K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),NONE,
+  NONE,NONE,K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter"),NONE]
+};
+const ZEN_COMBOS = [
+ {name:"combo_esc", keys:[1,2], out:"ESC", timeout:"50 ms", note:"Q + W"},
+ {name:"combo_base_flip", keys:[1,10], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"},
+ {name:"combo_bootload", keys:[0,11], out:"&bootloader", timeout:"50 ms", note:"outer top-row ∅ pair"},
+ {name:"combo_sysreset", keys:[12,23], out:"&sys_reset", timeout:"50 ms", note:"outer homerow ∅ pair"}
+];
+// ── TRACTYL (33: 3×10 + 3 thumbs; see tracktyl.dtsi transform) ──
+const TRACTYL = {
+ colemak: [
+  K("Q"),K("W"),K("F"),K("P"),K("G"),K("J"),K("L"),K("U"),K("Y"),K(";"),
+  K("A","⇧ hold","hold"),K("R","⌥ hold","hold"),K("S","⌘ hold","hold"),K("T","⌃ hold","hold"),K("D"),K("H"),K("N","⌃ hold","hold"),K("E","⌘ hold","hold"),K("I","⌥ hold","hold"),K("O","⇧ hold","hold"),
+  K("Z"),K("X"),K("C"),K("V"),K("B"),K("K"),K("M"),K(","),K("."),K("/"),
+  K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt")],
+ qwerty: [
+  K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),
+  K("A","⇧ hold","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),
+  K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),
+  K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt")],
+ num: [
+  K("F7"),K("F5"),K("F3"),K("F1"),K("F9"),K("F10"),K("F2"),K("F4"),K("F6"),K("F8"),
+  K("7","⇧ hold","hold"),K("5","⌥ hold","hold"),K("3","⌘ hold","hold"),K("1","⌃ hold","hold"),K("9"),K("0"),K("2","⌃ hold","hold"),K("4","⌘ hold","hold"),K("6","⌥ hold","hold"),K("8","⇧ hold","hold"),
+  K("\\"),K("'"),NONE,NONE,NONE,NONE,K("["),K("]"),K("-"),K("="),
+  NONE,K("Bksp"),K("Pause","Break","sys")],
+ raise: [
+  K("ESC"),K("Home"),K("Up"),K("End"),NONE,K("⏻ BL","bootloader","sys"),K("tog 6","GAMING","mo"),K("tog 7","FUSION","mo"),NONE,K("Del"),
+  K("Tab"),K("←"),K("↓"),K("→"),NONE,NONE,K("LCtrl"),K("LGui"),K("LAlt"),K("Menu","⇧ hold","hold"),
+  NONE,K("⏮"),K("⏯"),K("⏭"),NONE,K("sys_reset","","sys"),K("BT 1","BT_SEL 0","sys"),K("BT 2","BT_SEL 1","sys"),K("BT 3","BT_SEL 2","sys"),K("BT 4","BT_SEL 3","sys"),
+  K("Space"),NONE,NONE],
+ system: [
+  K("tog 0","→COLEMAK","mo"),K("tog 1","→QWERTY","mo"),K("BT_CLR","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,
+  K("BT_NXT","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,
+  K("BT_PRV","","sys"),TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,TRANS,
+  TRANS,TRANS,TRANS],
+ mouse: [
+  K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),
+  K("A","⇧ hold","hold"),K("S","⌥ hold","hold"),K("RCLK","mkp","sys"),K("LCLK","mkp","sys"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),
+  K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),
+  K("Space"),K("Bksp"),K("Enter")],
+ gaming: [
+  K("Tab"),K("Q"),K("W"),K("E"),K("R"),K("T"),K("Z"),K("U"),K("I"),K("O"),
+  K("LShift"),K("A"),K("S"),K("D"),K("F"),K("G"),K("LCLK","mkp","sys"),K("RCLK","mkp","sys"),K("K"),K("L"),
+  K("LCtrl"),K("Y"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),
+  K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt")],
+ fusion: [
+  K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),
+  K("A","hold MCLK","hold"),K("S","⌥ hold","hold"),K("D","⌘ hold","hold"),K("F","⌃ hold","hold"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),
+  K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),
+  K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter","hold SYSTEM","lt")]
+};
+const TRACTYL_COMBOS = [
+ {name:"combo_esc", keys:[0,1], out:"ESC", timeout:"50 ms", note:"Q + W"},
+ {name:"combo_middleclick", keys:[12,13], out:"&mlt 2 MCLK (tap MCLK / hold MOUSE)", timeout:"50 ms", note:"homerow S+T position pair"},
+ {name:"combo_middlepress", keys:[16,17], out:"&mkp MCLK", timeout:"50 ms", note:"N+E position pair"},
+ {name:"combo_bootload", keys:[0,30], out:"&bootloader", timeout:"50 ms", note:"Q + LOWER/Space thumb"},
+ {name:"combo_sysreset", keys:[0,24], out:"&sys_reset", timeout:"50 ms", note:"Q + B"},
+ {name:"combo_base_flip", keys:[0,9], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"}
+];
+const BOARDS = {
+ hatsu: { tab:"Hatsu · 52 keys", colors:true, src:"config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 4 combos", geom:"hatsu", layers:HATSU, combos:HATSU_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
+ zen: { tab:"Corneish Zen · 42 keys", colors:false, src:"config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 4 combos", geom:"zen", layers:ZEN, combos:ZEN_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
+ tractyl: { tab:"Tractyl · 33 keys", colors:false, src:"config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 6 combos", geom:"tractyl", layers:TRACTYL, combos:TRACTYL_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] }
+};
+let current = "hatsu";
+const tabsEl = document.getElementById("tabs"), app = document.getElementById("app"), srcLine = document.getElementById("src-line");
+Object.keys(BOARDS).forEach(name=>{
+  const b=document.createElement("button"); b.textContent=BOARDS[name].tab; b.dataset.board=name;
+  b.onclick=()=>{ current=name; render(); };
+  tabsEl.appendChild(b);
+});
+function keyDiv(k,i){
+  const d=document.createElement("div"); d.className="key "+k.c; d.dataset.pos=i;
+  d.innerHTML='<span class="pos">'+i+'</span><span class="t"></span>'+(k.h?'<span class="h"></span>':"");
+  d.querySelector(".t").textContent=k.t;
+  if(k.h) d.querySelector(".h").textContent=k.h;
+  return d;
+}
+function rowDiv(keys,cls){ const r=document.createElement("div"); r.className="row "+cls; keys.forEach(o=>r.appendChild(keyDiv(o.k,o.pos))); return r; }
+function withPos(arr,s,e){ return arr.slice(s,e).map((k,j)=>({k:k,pos:s+j})); }
+function halfDiv(){ const h=document.createElement("div"); h.className="half"; return h; }
+function sp(){ return document.createElement("div"); }
+function trow(arr, cols, list){
+  const r=document.createElement("div"); r.className="throw c"+cols;
+  list.forEach(p=>r.appendChild(p===null ? sp() : keyDiv(arr[p],p)));
+  return r;
+}
+function buildKb(geom, arr){
+  const w=document.createElement("div"); w.className="split";
+  const L=halfDiv(), R=halfDiv(), mid=document.createElement("div"); mid.className="mid";
+  if(geom==="hatsu"){
+    L.appendChild(rowDiv(withPos(arr,0,6),"r6"));
+    L.appendChild(rowDiv(withPos(arr,12,18),"r6"));
+    L.appendChild(rowDiv(withPos(arr,24,30),"r6"));
+    L.appendChild(trow(arr,6,[null,null,36,37,null,null]));
+    L.appendChild(trow(arr,6,[null,null,null,null,40,41]));
+    L.appendChild(trow(arr,6,[null,null,null,null,44,45]));
+    L.appendChild(trow(arr,6,[null,null,null,null,48,49]));
+    R.appendChild(rowDiv(withPos(arr,6,12),"r6"));
+    R.appendChild(rowDiv(withPos(arr,18,24),"r6"));
+    R.appendChild(rowDiv(withPos(arr,30,36),"r6"));
+    R.appendChild(trow(arr,6,[null,null,38,39,null,null]));
+    R.appendChild(trow(arr,6,[42,43,null,null,null,null]));
+    R.appendChild(trow(arr,6,[46,47,null,null,null,null]));
+    R.appendChild(trow(arr,6,[50,51,null,null,null,null]));
+  } else if(geom==="zen"){
+    L.appendChild(rowDiv(withPos(arr,0,6),"r6"));
+    L.appendChild(rowDiv(withPos(arr,12,18),"r6"));
+    L.appendChild(rowDiv(withPos(arr,24,30),"r6"));
+    L.appendChild(trow(arr,6,[null,null,null,36,37,38]));
+    R.appendChild(rowDiv(withPos(arr,6,12),"r6"));
+    R.appendChild(rowDiv(withPos(arr,18,24),"r6"));
+    R.appendChild(rowDiv(withPos(arr,30,36),"r6"));
+    R.appendChild(trow(arr,6,[39,40,41,null,null,null]));
+  } else {
+    L.appendChild(rowDiv(withPos(arr,0,5),"r5"));
+    L.appendChild(rowDiv(withPos(arr,10,15),"r5"));
+    L.appendChild(rowDiv(withPos(arr,20,25),"r5"));
+    L.appendChild(trow(arr,5,[null,null,null,null,30]));
+    R.appendChild(rowDiv(withPos(arr,5,10),"r5"));
+    R.appendChild(rowDiv(withPos(arr,15,20),"r5"));
+    R.appendChild(rowDiv(withPos(arr,25,30),"r5"));
+    R.appendChild(trow(arr,5,[31,32,null,null,null]));
+  }
+  w.appendChild(L); w.appendChild(mid); w.appendChild(R);
+  return w;
+}
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.board===current));
+  const B=BOARDS[current];
+  srcLine.innerHTML="Source: <code>"+B.src+"</code>";
+  app.innerHTML="";
+  const lg=document.createElement("div"); lg.className="legend";
+  lg.innerHTML="<span><b>tap</b> center</span><span><b>small</b> = hold behavior</span><span>dashed = hold-tap</span><span>purple = layer-tap</span><span>brown = mo/tog/to</span><span>blue = system/BT/mouse-btn</span>";
+  app.appendChild(lg);
+  const cs=document.createElement("section"); cs.className="card"; cs.id="combos";
+  cs.innerHTML="<h2>Combos · "+current+" ("+B.combos.length+", all 50&nbsp;ms)</h2><p class='meta'>Click a row to highlight the chord on layer 0 below.</p>";
+  const t=document.createElement("table"); t.className="combos";
+  t.innerHTML="<tr><th>Name</th><th>Keys (pos)</th><th>Output</th><th>Note</th></tr>";
+  B.combos.forEach(c=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td><code>"+c.name+"</code></td><td>"+c.keys.join(" + ")+"</td><td><code>"+c.out+"</code> · "+c.timeout+"</td><td>"+c.note+"</td>";
+    tr.onclick=()=>{
+      t.querySelectorAll("tr").forEach(r=>r.classList.remove("active"));
+      tr.classList.add("active");
+      document.querySelectorAll('#layer-0 .key').forEach(k=>k.classList.remove("combo-hi"));
+      c.keys.forEach(p=>{ const el=document.querySelector('#layer-0 .key[data-pos="'+p+'"]'); if(el) el.classList.add("combo-hi"); });
+      document.getElementById("layer-0").scrollIntoView({behavior:"smooth"});
+    };
+    t.appendChild(tr);
+  });
+  cs.appendChild(t); app.appendChild(cs);
+  B.order.forEach((lname,idx)=>{
+    const arr=B.layers[lname], col=LAYER_COLORS[idx];
+    const s=document.createElement("section"); s.className="card"; s.id="layer-"+idx; s.dataset.layer=lname;
+    const dot=B.colors?'<span class="dot" style="background:'+col+'"></span>':"";
+    const cmeta=B.colors?' · layer color <code>'+col+'</code>':"";
+    s.innerHTML='<h2>'+dot+LAYER_META[idx].label+'</h2><p class="meta">'+LAYER_META[idx].desc+cmeta+'</p>';
+    s.appendChild(buildKb(B.geom, arr));
+    app.appendChild(s);
+  });
+}
+render();
+</script>
+</body>
+</html>
