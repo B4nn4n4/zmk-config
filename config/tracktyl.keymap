@@ -15,6 +15,11 @@
 #define GAMING 6
 #define FUSION 7
 
+/* Alpha row origins for the shared combo include (3x5 split) */
+#define UML_ROW1 0
+#define UML_ROW2 10
+#define UML_ROW3 20
+
 / {
     behaviors {
 #include "behaviors/homerow.dtsi"
@@ -70,6 +75,8 @@
             key-positions = <0 9>;
             bindings = <&tog BASE_QWERTY>;
         };
+
+#include "combos/umlauts.dtsi"
     };
 
     input_processors {

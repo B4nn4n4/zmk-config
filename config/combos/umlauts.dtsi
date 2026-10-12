@@ -1,0 +1,97 @@
+/*
+ * Umlaut combos — shared across boards.
+ *
+ * Host layout: US, international with AltGr dead keys.
+ *   AltGr+Q = ä   AltGr+P = ö   AltGr+Y = ü   AltGr+S = ß
+ * A held modifier passes through the combo, so Shift+chord yields Ä Ö Ü.
+ *
+ * Scheme: X (left ring, bottom row) is the umlaut anchor; the other key is
+ * the vowel itself.
+ *   ä = X + A      ö = X + O      ü = X + U      ß = X + Z   ("sz")
+ *
+ * ß uses Z rather than S because QWERTY's S sits on the same finger as X
+ * (both left ring), which is physically unchordable. Z gives the German
+ * "sz" transliteration and the same position on both layouts.
+ *
+ * Forked per base layer where the vowel moves: O and U sit on different
+ * positions in Colemak and QWERTY. A and Z are identical on both, so those
+ * two are single combos scoped to all base layers.
+ *
+ * The including keymap must define, before the include:
+ *   UML_ROW1 — position of the first letter of the top alpha row
+ *   UML_ROW2 — position of the first letter of the home row
+ *   UML_ROW3 — position of the first letter of the bottom alpha row
+ * and the BASE_COLEMAK / BASE_QWERTY / FUSION layer numbers.
+ * Column index is 0..9, left pinky to right pinky.
+ *
+ * Needs CONFIG_ZMK_COMBO_MAX_COMBOS_PER_KEY >= 6 (six combos share X).
+ */
+
+#define UML_R1(c) (UML_ROW1 + c)
+#define UML_R2(c) (UML_ROW2 + c)
+#define UML_R3(c) (UML_ROW3 + c)
+
+#define UML_X UML_R3(1)
+
+/* ── same positions on both bases ── */
+
+/*
+ * ä — X + A. Same hand (ring + pinky); A is the left homerow shift, and
+ * pairing a shift with a same-hand key is safe since you would capitalize a
+ * left-hand letter with the right shift. Timeout is tighter than the rest
+ * because "ax" is a real mid-word bigram (Taxi, Praxis, maximal).
+ */
+combo_ae {
+    timeout-ms = <40>;
+    key-positions = <UML_X UML_R2(0)>;
+    layers = <BASE_COLEMAK BASE_QWERTY FUSION>;
+    bindings = <&kp RA(Q)>;
+};
+
+/* ß — X + Z, both bottom row, ring + pinky. "xz" is never a bigram. */
+combo_ss {
+    timeout-ms = <50>;
+    key-positions = <UML_X UML_R3(0)>;
+    layers = <BASE_COLEMAK BASE_QWERTY FUSION>;
+    bindings = <&kp RA(S)>;
+};
+
+/* ── Colemak fork ── */
+
+/*
+ * ö — X + O (right pinky home). Cross-hand. Note O is also the right
+ * homerow shift, so a near-simultaneous right-shift + X fires ö instead of
+ * capital X; hold the shift a beat first to avoid it.
+ */
+combo_oe_cm {
+    timeout-ms = <50>;
+    key-positions = <UML_X UML_R2(9)>;
+    layers = <BASE_COLEMAK>;
+    bindings = <&kp RA(P)>;
+};
+
+/* ü — X + U (right middle, top row). Cross-hand, no mods, no bigram. */
+combo_ue_cm {
+    timeout-ms = <50>;
+    key-positions = <UML_X UML_R1(7)>;
+    layers = <BASE_COLEMAK>;
+    bindings = <&kp RA(Y)>;
+};
+
+/* ── QWERTY fork (also active on FUSION, which is QWERTY-shaped) ── */
+
+/* ö — X + O (right ring, top row). Cross-hand, no mods, no bigram. */
+combo_oe_qw {
+    timeout-ms = <50>;
+    key-positions = <UML_X UML_R1(8)>;
+    layers = <BASE_QWERTY FUSION>;
+    bindings = <&kp RA(P)>;
+};
+
+/* ü — X + U (right index, top row). Cross-hand, no mods, no bigram. */
+combo_ue_qw {
+    timeout-ms = <50>;
+    key-positions = <UML_X UML_R1(6)>;
+    layers = <BASE_QWERTY FUSION>;
+    bindings = <&kp RA(Y)>;
+};
