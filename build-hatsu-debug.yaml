@@ -1,0 +1,6 @@
+# Manual battery-diagnostics build. USB CDC logging replaces Studio on the left.
+---
+include:
+  - board: hatsu_left//zmk
+    artifact-name: hatsu-left-debug
+    cmake-args: -DCONFIG_ZMK_USB_LOGGING=y -DCONFIG_ZMK_STUDIO=n -DCONFIG_SENSOR_LOG_LEVEL_DBG=y

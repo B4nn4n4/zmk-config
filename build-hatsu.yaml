@@ -4,6 +4,7 @@
 ---
 include:
   - board: hatsu_left//zmk
+    snippet: studio-rpc-usb-uart
   - board: hatsu_right//zmk
   - board: hatsu_left//zmk
     shield: settings_reset

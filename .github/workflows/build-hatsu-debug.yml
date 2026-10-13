@@ -1,0 +1,11 @@
+name: Build Hatsu Debug
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build-hatsu-debug.yaml
+      config_path: config
+      archive_name: hatsu-debug-firmware
