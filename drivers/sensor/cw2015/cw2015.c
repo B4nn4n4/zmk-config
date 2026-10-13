@@ -91,7 +91,10 @@ static int cw2015_sample_fetch(const struct device *dev, enum sensor_channel cha
             LOG_WRN("failed to read state-of-charge: %d", err);
             goto done;
         }
-        LOG_DBG("read soc: %d", drv_data->raw_state_of_charge);
+        LOG_DBG("read soc: raw=%u, level=%u.%02u%%",
+                (unsigned int)drv_data->raw_state_of_charge,
+                (unsigned int)(drv_data->raw_state_of_charge >> 8),
+                (unsigned int)(((drv_data->raw_state_of_charge & 0xFF) * 100) / 256));
         goto done;
     }
     if (chan == SENSOR_CHAN_GAUGE_VOLTAGE || chan == SENSOR_CHAN_VOLTAGE ||
@@ -101,7 +104,8 @@ static int cw2015_sample_fetch(const struct device *dev, enum sensor_channel cha
             LOG_WRN("failed to read vcell: %d", err);
             goto done;
         }
-        LOG_DBG("read vcell: %d", drv_data->raw_vcell);
+        LOG_DBG("read vcell: raw=%u, voltage=%u mV", (unsigned int)drv_data->raw_vcell,
+                (unsigned int)(((uint32_t)drv_data->raw_vcell * 305) / 1000));
         goto done;
     }
     if (chan == SENSOR_CHAN_GAUGE_TIME_TO_EMPTY || chan == SENSOR_CHAN_ALL) {
