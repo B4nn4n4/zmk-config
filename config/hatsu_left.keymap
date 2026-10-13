@@ -197,7 +197,7 @@
 
     layer_colors: layer_colors {
         compatible = "zmk,layer-colors";
-        /* 0:colemak green 1:qwerty white 2:num cyan 3:raise orange 4:system blue 5:mouse yellow 6:gaming mint 7:fusion magenta */
-        colors = <0x00FF00 0xFFFFFF 0x00FFFF 0xFF8000 0x0000FF 0xFFFF00 0x00FF88 0xFF00FF>;
+        /* 0:colemak none 1:qwerty white 2:num cyan 3:raise orange 4:system blue 5:mouse yellow 6:gaming mint 7:fusion magenta */
+        colors = <0x000000 0xFFFFFF 0x00FFFF 0xFF8000 0x0000FF 0xFFFF00 0x00FF88 0xFF00FF>;
     };
 };
