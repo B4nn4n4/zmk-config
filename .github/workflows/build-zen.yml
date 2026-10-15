@@ -3,12 +3,18 @@ on:
   push:
     paths:
       - 'config/corneish_zen.keymap'
-      - 'config/corneish_zen.conf'
+      - 'config/corneish_zen*.conf'
+      - 'src/charge_state.c'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
       - 'build-zen.yaml'
   pull_request:
     paths:
       - 'config/corneish_zen.keymap'
-      - 'config/corneish_zen.conf'
+      - 'config/corneish_zen*.conf'
+      - 'src/charge_state.c'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
       - 'build-zen.yaml'
   workflow_dispatch:
 

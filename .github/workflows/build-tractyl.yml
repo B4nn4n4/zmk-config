@@ -9,6 +9,9 @@ on:
       - 'config/tracktyl_left.conf'
       - 'config/tracktyl_right.conf'
       - 'config/boards/shields/tracktyl/**'
+      - 'src/charge_state.c'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
       - 'build-tractyl.yaml'
   pull_request:
     paths:
@@ -19,6 +22,9 @@ on:
       - 'config/tracktyl_left.conf'
       - 'config/tracktyl_right.conf'
       - 'config/boards/shields/tracktyl/**'
+      - 'src/charge_state.c'
+      - 'Kconfig'
+      - 'CMakeLists.txt'
       - 'build-tractyl.yaml'
   workflow_dispatch:
 
