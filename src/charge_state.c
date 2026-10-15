@@ -31,6 +31,15 @@ static void charge_state_update(struct k_work *work) {
 
     LOG_DBG("charge state: wired power %s", powered ? "connected" : "disconnected");
 
+    bt_bas_bls_set_battery_present(BT_BAS_BLS_BATTERY_PRESENT);
+
+    /*
+     * Qi charging is not firmware-detectable on any board here (AGENTS.md), so
+     * UNKNOWN rather than NOT_CONNECTED: a keyboard on a Qi pad is charging
+     * and we genuinely cannot tell.
+     */
+    bt_bas_bls_set_wireless_external_power_source(BT_BAS_BLS_WIRELESS_POWER_UNKNOWN);
+
     bt_bas_bls_set_wired_external_power_source(powered ? BT_BAS_BLS_WIRED_POWER_CONNECTED
                                                        : BT_BAS_BLS_WIRED_POWER_NOT_CONNECTED);
 
@@ -54,21 +63,17 @@ ZMK_LISTENER(charge_state, charge_state_listener);
 ZMK_SUBSCRIPTION(charge_state, zmk_usb_conn_state_changed);
 
 static int charge_state_init(void) {
-    bt_bas_bls_set_battery_present(BT_BAS_BLS_BATTERY_PRESENT);
-
-    /*
-     * Qi charging is not firmware-detectable on any board here (AGENTS.md), so
-     * UNKNOWN rather than NOT_CONNECTED: a keyboard on a Qi pad is charging
-     * and we genuinely cannot tell.
-     */
-    bt_bas_bls_set_wireless_external_power_source(BT_BAS_BLS_WIRELESS_POWER_UNKNOWN);
-
     return k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &charge_state_work);
 }
 
 /*
- * Must run AFTER Zephyr's bas_init(), which calls bt_bas_bls_init() and zeroes
- * the whole power-state bitfield -- at the same init level and priority it
- * would race and silently wipe everything set above.
+ * Zephyr's bas_init() calls bt_bas_bls_init(), which zeroes the whole
+ * power-state bitfield, and it runs at this same level and priority -- so this
+ * init only QUEUES the update. The work item runs once the kernel starts
+ * processing workqueues, i.e. after every SYS_INIT has returned, which is why
+ * it can't be clobbered. Do not try to order around bas_init() with a priority
+ * expression: SYS_INIT stringifies prio into a linker section name and rejects
+ * arithmetic (init.h), so `CONFIG_APPLICATION_INIT_PRIORITY + 1` fails the link
+ * with "Undefined initialization levels used."
  */
-SYS_INIT(charge_state_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY + 1);
+SYS_INIT(charge_state_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
