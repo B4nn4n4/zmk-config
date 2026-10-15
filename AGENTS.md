@@ -51,6 +51,14 @@ no local toolchain here.
   bindings itself. Never convert back to separate files. Custom behavior nodes live
   in the keymap overlay (ZMK compiles keymaps against a stub dts — board dts nodes
   are NOT visible there)
+- `src/charge_state.c` — the one cross-board module here (Zen and Tractyl build it too):
+  drives Zephyr's BAS 1.1 Battery Level Status characteristic (`0x2BED`) from
+  `zmk_usb_is_powered()` so the BLE host can show charging state. Gated by
+  `CONFIG_ZMK_CHARGE_STATE_REPORTING`, central-only. Its `SYS_INIT` runs at
+  `CONFIG_APPLICATION_INIT_PRIORITY + 1` on purpose — Zephyr's `bas_init()` zeroes the
+  BLS power-state bitfield, so same-priority init would silently wipe it. Because it is
+  shared, `build-zen.yml` / `build-tractyl.yml` watch `src/charge_state.c`, `Kconfig`
+  and `CMakeLists.txt` in addition to their own config paths
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)
@@ -87,6 +95,15 @@ no local toolchain here.
   their `as_*()` accessors unconditionally breaks the PERIPHERAL link — gate every
   reference with `KEYMAP_LOCAL` (`activity_state_changed`, `battery_state_changed`,
   `position_state_changed`, `split_peripheral_status_changed` compile on both halves)
+- `CONFIG_ZMK_USB` is `depends on (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)` upstream, so
+  `CONFIG_ZMK_USB=y` in `hatsu_right_nrf52840_zmk_defconfig` is SILENTLY DROPPED as an
+  unmet dependency — `zmk_usb_is_powered()` can never be true on the right half no
+  matter how VBUS is wired. The "no VBUS sensing on the right half" note below may
+  therefore be a false negative: the hardware bit (`POWER->USBREGSTATUS` via
+  `nrf_power_usbregstatus_vbusdet_get()`) is readable without ZMK's USB stack and has
+  never actually been tested. Peripheral→central data has no user-extensible channel,
+  but the split transport's existing `BATTERY_EVENT` / `SENSOR_EVENT` / `INPUT_EVENT`
+  carriers can be repurposed without forking ZMK (see README limitations)
 - Layer colors mirror to the peripheral via the hidden GLOBAL behavior `lc`
   (`src/behaviors/behavior_layer_color.c`, never bound to a key): the central invokes it
   programmatically on layer/activity/peripheral-reconnect events, and

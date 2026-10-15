@@ -77,10 +77,63 @@ Source: `config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×1
 
 <!-- KEYMAP-OVERVIEW-END -->
 
+## Charging state on the host (Waybar)
+
+All three boards report USB charge state to the BLE host. Plain BAS (`0x2A19`) carries
+a battery *level* only, so this uses the BAS 1.1 **Battery Level Status**
+characteristic (`0x2BED`), which has a charge-state field. Zephyr implements the
+characteristic but ZMK never populates it, so `src/charge_state.c` drives it from
+`zmk_usb_is_powered()` — enabled per central half with:
+
+```
+CONFIG_ZMK_CHARGE_STATE_REPORTING=y
+```
+
+in `config/hatsu_left.conf`, `config/tracktyl_left.conf`, `config/corneish_zen_left.conf`.
+
+Host side, `host/waybar-zmk-charging.sh` reads `0x2BED` over D-Bus (BlueZ's battery
+plugin only reads `0x2A19` and `org.bluez.Battery1` has no charging property — the
+per-component battery objects that do are still behind BlueZ's experimental D-Bus
+flag):
+
+```jsonc
+"custom/keeb-charging": {
+  "exec": "~/Repos/zmk-config/host/waybar-zmk-charging.sh hatsu",
+  "return-type": "json",
+  "interval": 30
+}
+```
+
+Empty `text` when on battery, so the module hides itself; `ZMK_SHOW_IDLE=1` keeps it
+visible. Classes: `charging` / `discharging` / `absent`.
+
+### Limitations
+
+- **Central (left) half only** — not a hard limit, just not built. In practice the
+  central is the half you plug the cable into. Doing the peripheral too is possible
+  without forking ZMK, via two non-obvious steps: read VBUS straight off
+  `POWER->USBREGSTATUS` with `nrf_power_usbregstatus_vbusdet_get()` (ZMK's `ZMK_USB`
+  is `depends on (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)` so the USB stack can never
+  come up on a peripheral — but the hardware VBUS bit does not need it), then smuggle
+  the flag over one of the split transport's existing peripheral→central carriers
+  (`BATTERY_EVENT` → `zmk_peripheral_battery_state_changed` is the least intrusive;
+  `SENSOR_EVENT` and `INPUT_EVENT` also work) and republish it on a custom GATT
+  characteristic, since Zephyr's BAS has only one BLS instance. Open question on
+  Hatsu: whether VBUS physically reaches the right half's nRF at all — `AGENTS.md`
+  says no, but that may be a false negative from testing through `ZMK_USB`.
+- **"Charging" means VBUS present.** No board here has a charger-status interface, so
+  a full battery left plugged in still reads as charging. Same signal the on-keyboard
+  indicator uses.
+- **Qi charging is reported as `UNKNOWN`**, not "not connected" — it isn't
+  firmware-detectable, and claiming otherwise would be wrong.
+- **Over USB there's nothing at all**: ZMK implements no HID battery page, so this is
+  a BLE-only signal.
+
+
 ## Build pipelines (4 workflows)
 
 - `build-hatsu.yml` → `build-hatsu.yaml` — triggers on `config/hatsu*`, `boards/**`, `dts/**`, `drivers/**`, `src/**`
-- `build-zen.yml` → `build-zen.yaml` — triggers on `config/corneish_zen.*`
+- `build-zen.yml` → `build-zen.yaml` — triggers on `config/corneish_zen.keymap`, `config/corneish_zen*.conf`
 - `build-tractyl.yml` → `build-tractyl.yaml` — triggers on `config/tracktyl*`, `config/boards/shields/tracktyl/**`
 - `build-all.yml` → `build.yaml` (all boards + `settings_reset`) — **unified trigger** for central changes: `config/layouts/**`, `config/behaviors/**`, `config/west.yml`, `build*.yaml`, `.github/workflows/**`
 
