@@ -98,13 +98,20 @@
         compatible = "zmk,input-listener";
         device = <&trackball>;
         input-processors = <&zip_xy_scaler 1 5>,<&zip_temp_layer 5 250>;
-        scroll_v {
-            layers = <2>;
-            input-processors = <&zip_xy_scaler 1 100>, <&y_to_vscroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
-        };
+        /*
+         * Overrides are evaluated top to bottom and the first match wins
+         * (later overrides and the base processors are skipped). scroll_h is
+         * declared first on purpose: with LOWER and RAISE both held — scroll
+         * combo plus the right thumb — RAISE wins, so adding the layer key to
+         * a vertical scroll turns it horizontal.
+         */
         scroll_h {
             layers = <3>;
             input-processors = <&zip_xy_scaler 1 100>, <&x_to_hscroll_mapper>;
+        };
+        scroll_v {
+            layers = <2>;
+            input-processors = <&zip_xy_scaler 1 100>, <&y_to_vscroll_mapper>, <&zip_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>;
         };
     };
 
@@ -140,7 +147,7 @@
                 &kp F7  &kp F5  &kp F3  &kp F1  &kp F9    &kp F10  &kp F2  &kp F4  &kp F6  &kp F8
                 &bhm LSHIFT N7 &bhm LALT N5 &bhm LGUI N3 &bhm LCTRL N1 &kp N9   &kp N0  &bhm LCTRL N2 &bhm LGUI N4 &bhm LALT N6 &bhm LSHIFT N8
                 &kp BSLH &kp SQT &none &none &none    &none  &kp LBKT &kp RBKT &kp MINUS &kp EQUAL
-                                                                &none  &kp BSPC  &kp PAUSE_BREAK
+                                                                &none  &lt RAISE BSPC  &kp PAUSE_BREAK
             >;
         };
 
@@ -173,7 +180,7 @@
                 &kp QW_R1L1  &kp QW_R1L2  &kp QW_R1L3  &kp QW_R1L4  &kp QW_R1L5    &kp QW_R1R1  &kp QW_R1R2  &kp QW_R1R3  &kp QW_R1R4  &kp QW_R1R5
                 &bhm LSHIFT QW_R2L1  &bhm LALT QW_R2L2  &mkp RCLK &mkp LCLK &kp QW_R2L5    &kp QW_R2R1  &bhm LCTRL QW_R2R2  &bhm LGUI QW_R2R3  &bhm LALT QW_R2R4  &bhm LSHIFT QW_R2R5
                 &kp QW_R3L1  &kp QW_R3L2  &kp QW_R3L3  &kp QW_R3L4  &kp QW_R3L5    &kp QW_R3R1  &kp QW_R3R2  &kp QW_R3R3  &kp QW_R3R4  &kp QW_R3R5
-                                                                &kp SPACE  &kp BSPC  &kp ENTER
+                                                                &lt LOWER SPACE  &lt RAISE BSPC  &kp ENTER
             >;
         };
 

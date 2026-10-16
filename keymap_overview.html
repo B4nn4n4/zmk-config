@@ -60,7 +60,8 @@
 </header>
 <div class="tabs" id="tabs"></div>
 <main id="app"></main>
-<footer>Corner numbers are ZMK key-position indices. Layer colors exist only on Hatsu (physical RGB via the <code>layer_colors</code> node in <code>hatsu_left.keymap</code>).</footer>
+<footer>Corner numbers are ZMK key-position indices. Layer colors exist only on Hatsu (physical RGB via the <code>layer_colors</code> node in <code>hatsu_left.keymap</code>).<br>
+Umlaut combos (<code>config/combos/umlauts.dtsi</code>, shared by all three boards) send AltGr pairs and require the host layout <b>US, international with AltGr dead keys</b>. Hold either shift for Ä&nbsp;Ö&nbsp;Ü. Tractyl trackball scrolling: hold LOWER for vertical, RAISE for horizontal — reachable from the scroll combo, the thumbs, or the ball-activated MOUSE layer.</footer>
 <script>
 function K(t,h,c){ return {t:t,h:h||"",c:c||""}; }
 const NONE = K("∅","","none"), TRANS = K("▽","","trans");
@@ -68,8 +69,8 @@ const LAYER_COLORS = ["#00FF00","#FFFFFF","#00FFFF","#FF8000","#0000FF","#FFFF00
 const LAYER_META = [
  {label:"0 · Colemak (default base)", desc:"Default on boot. Base-flip chord or SYSTEM &tog switches to QWERTY (runtime only)."},
  {label:"1 · QWERTY (toggle base)", desc:"Same geometry, QWERTY legends. Reboot returns to Colemak."},
- {label:"2 · LOWER / NUM", desc:"F-keys row + numbers on homerow (hold-tap mods kept)."},
- {label:"3 · RAISE / NAV", desc:"Arrows/media/BT + toggles into GAMING (6) and FUSION (7)."},
+ {label:"2 · LOWER / NUM", desc:"F-keys row + numbers on homerow (hold-tap mods kept). On Tractyl, holding it also puts the trackball in vertical scroll."},
+ {label:"3 · RAISE / NAV", desc:"Arrows/media/BT + toggles into GAMING (6) and FUSION (7). On Tractyl, holding it puts the trackball in horizontal scroll, and it wins when LOWER is held too."},
  {label:"4 · SYSTEM", desc:"BT / bootloader / sys_reset / base toggles."},
  {label:"5 · MOUSE", desc:"Mouse keys; geometry differs per board (see notes)."},
  {label:"6 · GAMING", desc:"Mods-free (Hatsu/Zen) or custom (Tractyl) gaming layout."},
@@ -131,7 +132,13 @@ const HATSU_COMBOS = [
  {name:"combo_esc", keys:[0,1], out:"ESC", timeout:"50 ms", note:"top-left two keys"},
  {name:"combo_base_flip", keys:[1,10], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"},
  {name:"combo_bootload", keys:[44,47], out:"&bootl (UF2)", timeout:"50 ms", note:"hidden thumb chord (both ∅ on base layers)"},
- {name:"combo_sysreset", keys:[45,46], out:"&sys_reset", timeout:"50 ms", note:"hidden thumb chord (both ∅ on base layers)"}
+ {name:"combo_sysreset", keys:[45,46], out:"&sys_reset", timeout:"50 ms", note:"hidden thumb chord (both ∅ on base layers)"},
+ {name:"combo_ae", keys:[26,13], out:"ä — &kp RA(Q)", timeout:"40 ms", note:"X + A · both bases · 40 ms because “ax” is a real bigram"},
+ {name:"combo_ss", keys:[26,25], out:"ß — &kp RA(S)", timeout:"50 ms", note:"X + Z · both bases · Z not S (“sz”); QWERTY S is same finger as X"},
+ {name:"combo_oe_cm", keys:[26,22], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · Colemak only · O is the right ⇧, hold it a beat before chording"},
+ {name:"combo_ue_cm", keys:[26,8], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · Colemak only"},
+ {name:"combo_oe_qw", keys:[26,9], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · QWERTY + FUSION only"},
+ {name:"combo_ue_qw", keys:[26,7], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · QWERTY + FUSION only"}
 ];
 // ── ZEN (42: 3×12 + 6 thumbs) ──
 const ZEN = {
@@ -180,7 +187,13 @@ const ZEN_COMBOS = [
  {name:"combo_esc", keys:[1,2], out:"ESC", timeout:"50 ms", note:"Q + W"},
  {name:"combo_base_flip", keys:[1,10], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"},
  {name:"combo_bootload", keys:[0,11], out:"&bootloader", timeout:"50 ms", note:"outer top-row ∅ pair"},
- {name:"combo_sysreset", keys:[12,23], out:"&sys_reset", timeout:"50 ms", note:"outer homerow ∅ pair"}
+ {name:"combo_sysreset", keys:[12,23], out:"&sys_reset", timeout:"50 ms", note:"outer homerow ∅ pair"},
+ {name:"combo_ae", keys:[26,13], out:"ä — &kp RA(Q)", timeout:"40 ms", note:"X + A · both bases · 40 ms because “ax” is a real bigram"},
+ {name:"combo_ss", keys:[26,25], out:"ß — &kp RA(S)", timeout:"50 ms", note:"X + Z · both bases · Z not S (“sz”); QWERTY S is same finger as X"},
+ {name:"combo_oe_cm", keys:[26,22], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · Colemak only · O is the right ⇧, hold it a beat before chording"},
+ {name:"combo_ue_cm", keys:[26,8], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · Colemak only"},
+ {name:"combo_oe_qw", keys:[26,9], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · QWERTY + FUSION only"},
+ {name:"combo_ue_qw", keys:[26,7], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · QWERTY + FUSION only"}
 ];
 // ── TRACTYL (33: 3×10 + 3 thumbs; see tracktyl.dtsi transform) ──
 const TRACTYL = {
@@ -198,7 +211,7 @@ const TRACTYL = {
   K("F7"),K("F5"),K("F3"),K("F1"),K("F9"),K("F10"),K("F2"),K("F4"),K("F6"),K("F8"),
   K("7","⇧ hold","hold"),K("5","⌥ hold","hold"),K("3","⌘ hold","hold"),K("1","⌃ hold","hold"),K("9"),K("0"),K("2","⌃ hold","hold"),K("4","⌘ hold","hold"),K("6","⌥ hold","hold"),K("8","⇧ hold","hold"),
   K("\\"),K("'"),NONE,NONE,NONE,NONE,K("["),K("]"),K("-"),K("="),
-  NONE,K("Bksp"),K("Pause","Break","sys")],
+  NONE,K("Bksp","hold RAISE","lt"),K("Pause","Break","sys")],
  raise: [
   K("ESC"),K("Home"),K("Up"),K("End"),NONE,K("⏻ BL","bootloader","sys"),K("tog 6","GAMING","mo"),K("tog 7","FUSION","mo"),NONE,K("Del"),
   K("Tab"),K("←"),K("↓"),K("→"),NONE,NONE,K("LCtrl"),K("LGui"),K("LAlt"),K("Menu","⇧ hold","hold"),
@@ -213,7 +226,7 @@ const TRACTYL = {
   K("Q"),K("W"),K("E"),K("R"),K("T"),K("Y"),K("U"),K("I"),K("O"),K("P"),
   K("A","⇧ hold","hold"),K("S","⌥ hold","hold"),K("RCLK","mkp","sys"),K("LCLK","mkp","sys"),K("G"),K("H"),K("J","⌃ hold","hold"),K("K","⌘ hold","hold"),K("L","⌥ hold","hold"),K(";","⇧ hold","hold"),
   K("Z"),K("X"),K("C"),K("V"),K("B"),K("N"),K("M"),K(","),K("."),K("/"),
-  K("Space"),K("Bksp"),K("Enter")],
+  K("Space","hold LOWER","lt"),K("Bksp","hold RAISE","lt"),K("Enter")],
  gaming: [
   K("Tab"),K("Q"),K("W"),K("E"),K("R"),K("T"),K("Z"),K("U"),K("I"),K("O"),
   K("LShift"),K("A"),K("S"),K("D"),K("F"),K("G"),K("LCLK","mkp","sys"),K("RCLK","mkp","sys"),K("K"),K("L"),
@@ -227,16 +240,22 @@ const TRACTYL = {
 };
 const TRACTYL_COMBOS = [
  {name:"combo_esc", keys:[0,1], out:"ESC", timeout:"50 ms", note:"Q + W"},
- {name:"combo_middleclick", keys:[12,13], out:"&mlt 2 MCLK (tap MCLK / hold MOUSE)", timeout:"50 ms", note:"homerow S+T position pair"},
+ {name:"combo_middleclick", keys:[12,13], out:"&mlt 2 MCLK (tap MCLK / hold LOWER)", timeout:"50 ms", note:"scroll combo — holding it puts the trackball in vertical scroll; add the right thumb for horizontal"},
  {name:"combo_middlepress", keys:[16,17], out:"&mkp MCLK", timeout:"50 ms", note:"N+E position pair"},
  {name:"combo_bootload", keys:[0,30], out:"&bootloader", timeout:"50 ms", note:"Q + LOWER/Space thumb"},
  {name:"combo_sysreset", keys:[0,24], out:"&sys_reset", timeout:"50 ms", note:"Q + B"},
- {name:"combo_base_flip", keys:[0,9], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"}
+ {name:"combo_base_flip", keys:[0,9], out:"&tog BASE_QWERTY (flip-flop)", timeout:"50 ms", note:"Q + ; — toggles Colemak ↔ QWERTY"},
+ {name:"combo_ae", keys:[21,10], out:"ä — &kp RA(Q)", timeout:"40 ms", note:"X + A · both bases · 40 ms because “ax” is a real bigram"},
+ {name:"combo_ss", keys:[21,20], out:"ß — &kp RA(S)", timeout:"50 ms", note:"X + Z · both bases · Z not S (“sz”); QWERTY S is same finger as X"},
+ {name:"combo_oe_cm", keys:[21,19], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · Colemak only · O is the right ⇧, hold it a beat before chording"},
+ {name:"combo_ue_cm", keys:[21,7], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · Colemak only"},
+ {name:"combo_oe_qw", keys:[21,8], out:"ö — &kp RA(P)", timeout:"50 ms", note:"X + O · QWERTY + FUSION only"},
+ {name:"combo_ue_qw", keys:[21,6], out:"ü — &kp RA(Y)", timeout:"50 ms", note:"X + U · QWERTY + FUSION only"}
 ];
 const BOARDS = {
- hatsu: { tab:"Hatsu · 52 keys", colors:true, src:"config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 4 combos", geom:"hatsu", layers:HATSU, combos:HATSU_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
- zen: { tab:"Corneish Zen · 42 keys", colors:false, src:"config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 4 combos", geom:"zen", layers:ZEN, combos:ZEN_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
- tractyl: { tab:"Tractyl · 33 keys", colors:false, src:"config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 6 combos", geom:"tractyl", layers:TRACTYL, combos:TRACTYL_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] }
+ hatsu: { tab:"Hatsu · 52 keys", colors:true, src:"config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 10 combos", geom:"hatsu", layers:HATSU, combos:HATSU_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
+ zen: { tab:"Corneish Zen · 42 keys", colors:false, src:"config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 10 combos", geom:"zen", layers:ZEN, combos:ZEN_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] },
+ tractyl: { tab:"Tractyl · 33 keys", colors:false, src:"config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 12 combos", geom:"tractyl", layers:TRACTYL, combos:TRACTYL_COMBOS, order:["colemak","qwerty","num","raise","system","mouse","gaming","fusion"] }
 };
 let current = "hatsu";
 const tabsEl = document.getElementById("tabs"), app = document.getElementById("app"), srcLine = document.getElementById("src-line");
@@ -310,7 +329,7 @@ function render(){
   lg.innerHTML="<span><b>tap</b> center</span><span><b>small</b> = hold behavior</span><span>dashed = hold-tap</span><span>purple = layer-tap</span><span>brown = mo/tog/to</span><span>blue = system/BT/mouse-btn</span>";
   app.appendChild(lg);
   const cs=document.createElement("section"); cs.className="card"; cs.id="combos";
-  cs.innerHTML="<h2>Combos · "+current+" ("+B.combos.length+", all 50&nbsp;ms)</h2><p class='meta'>Click a row to highlight the chord on layer 0 below.</p>";
+  cs.innerHTML="<h2>Combos · "+current+" ("+B.combos.length+")</h2><p class='meta'>Timeouts are per row. Click a row to highlight the chord on layer 0 below — QWERTY-only combos still highlight against the Colemak graphic.</p>";
   const t=document.createElement("table"); t.className="combos";
   t.innerHTML="<tr><th>Name</th><th>Keys (pos)</th><th>Output</th><th>Note</th></tr>";
   B.combos.forEach(c=>{
