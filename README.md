@@ -14,6 +14,7 @@ Unified ZMK config for **3 keyboards × 2 base layouts** — Hatsu / Corneish Ze
 
 - `config/layouts/alphas.h` — QWERTY vs Colemak (plain) per-row macros (`QW_R*`, `CM_R*`). Geometries differ so only letters are shared, not full `bindings` vectors.
 - `config/behaviors/homerow.dtsi` — single `bhm` 200 ms balanced hold-tap (included via `#include`).
+- `config/combos/umlauts.dtsi` — ä/ö/ü/ß combos for all three boards, parameterized by three `UML_ROW*` origin macros each keymap defines (so positions are computed, not hand-listed per board).
 - `config/west.yml` — `zmk@main` + `zmk-pmw3610-driver@main` for Tractyl trackball.
 
 Base layers (default Colemak, runtime toggle, not separate UF2s):
@@ -21,6 +22,20 @@ Base layers (default Colemak, runtime toggle, not separate UF2s):
 - Flip QWERTY↔Colemak live via outer `Q+P` chord (`&tog` flip-flop) or **SYSTEM layer** `&tog` keys; reboot always returns to Colemak (runtime-only, nothing persisted). Hatsu shows white while on QWERTY.
 
 Other shared: `NUM` F-keys/numbers, `NAV` arrows/media, `SYSTEM` BT, `MOUSE` `&mkp/&mmv/&msc`. Tractyl retains `trackball_listener` + combos; Hatsu retains `bat`/`bootl`/`lc` layer-color relay.
+
+### Umlauts (all boards)
+
+`X` is the anchor, the other key is the vowel: **X+A = ä, X+O = ö, X+U = ü, X+Z = ß** (`Z` for the "sz" transliteration — QWERTY's `S` shares the ring finger with `X` and can't be chorded). Hold either shift for Ä/Ö/Ü.
+
+Requires the host layout **US, international with AltGr dead keys** — the combos emit `RA(Q)/RA(P)/RA(Y)/RA(S)`, not Unicode. `ö` and `ü` are forked per base layer since those vowels move between Colemak and QWERTY; `ä` and `ß` share positions and are single combos. Active on both bases plus `FUSION`, never on `GAMING`. Needs `CONFIG_ZMK_COMBO_MAX_COMBOS_PER_KEY=8` (six combos share `X`; ZMK's default cap is 5, counted at compile time regardless of layer scoping).
+
+On Colemak, `O` is the right homerow shift — hold the shift a beat before chording, or `right-shift + X` fires `ö` instead of capital `X`.
+
+### Trackball scrolling (Tractyl)
+
+Hold **LOWER** for vertical, **RAISE** for horizontal. Reachable three ways: the thumbs, the scroll combo (`combo_middleclick`, hold = LOWER) with the right thumb added for horizontal, and the ball-activated `MOUSE` layer, whose Space/Bksp thumbs (pos 30/31) are now layer-taps for the same purpose.
+
+`scroll_h` is declared **before** `scroll_v` in `trackball_listener` deliberately: ZMK evaluates listener overrides top-to-bottom and the first match wins (later overrides *and* the parent's base processors are skipped), so with both layers held RAISE takes precedence and a vertical scroll becomes horizontal.
 
 ## Keymap overview
 
@@ -31,9 +46,9 @@ Other shared: `NUM` F-keys/numbers, `NAV` arrows/media, `SYSTEM` BT, `MOUSE` `&m
 <!-- KEYMAP-OVERVIEW-START -->
 
 ### Hatsu · 52 keys
-Source: `config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 4 combos`
+Source: `config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (pos 0–51) · 8 layers · 10 combos`
 
-**Combos (Hatsu · 52 keys)** — all 50 ms timeout
+**Combos (Hatsu · 52 keys)** — 50 ms timeout unless noted
 
 | Name | Keys (pos) | Output | Note |
 |---|---|---|---|
@@ -41,13 +56,19 @@ Source: `config/hatsu_left.keymap (symlinked as hatsu_right.keymap) · 52 keys (
 | `combo_base_flip` | 1 + 10 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
 | `combo_bootload` | 44 + 47 | `&bootl (UF2)` | hidden thumb chord (both ∅ on base layers) |
 | `combo_sysreset` | 45 + 46 | `&sys_reset` | hidden thumb chord (both ∅ on base layers) |
+| `combo_ae` | 26 + 13 | `ä — &kp RA(Q)` | X + A · both bases · **40 ms** ("ax" is a real bigram) |
+| `combo_ss` | 26 + 25 | `ß — &kp RA(S)` | X + Z · both bases · Z not S ("sz"); QWERTY S shares the ring finger with X |
+| `combo_oe_cm` | 26 + 22 | `ö — &kp RA(P)` | X + O · Colemak only |
+| `combo_ue_cm` | 26 + 8 | `ü — &kp RA(Y)` | X + U · Colemak only |
+| `combo_oe_qw` | 26 + 9 | `ö — &kp RA(P)` | X + O · QWERTY + FUSION |
+| `combo_ue_qw` | 26 + 7 | `ü — &kp RA(Y)` | X + U · QWERTY + FUSION |
 
 ![Layer overview — Hatsu · 52 keys](docs/keymap-hatsu.svg)
 
 ### Corneish Zen · 42 keys
-Source: `config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 4 combos`
+Source: `config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) · 8 layers · 10 combos`
 
-**Combos (Corneish Zen · 42 keys)** — all 50 ms timeout
+**Combos (Corneish Zen · 42 keys)** — 50 ms timeout unless noted
 
 | Name | Keys (pos) | Output | Note |
 |---|---|---|---|
@@ -55,22 +76,34 @@ Source: `config/corneish_zen.keymap · 42 keys (pos 0–41: 3×12 + 6 thumbs) ·
 | `combo_base_flip` | 1 + 10 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
 | `combo_bootload` | 0 + 11 | `&bootloader` | outer top-row ∅ pair |
 | `combo_sysreset` | 12 + 23 | `&sys_reset` | outer homerow ∅ pair |
+| `combo_ae` | 26 + 13 | `ä — &kp RA(Q)` | X + A · both bases · **40 ms** ("ax" is a real bigram) |
+| `combo_ss` | 26 + 25 | `ß — &kp RA(S)` | X + Z · both bases · Z not S ("sz"); QWERTY S shares the ring finger with X |
+| `combo_oe_cm` | 26 + 22 | `ö — &kp RA(P)` | X + O · Colemak only |
+| `combo_ue_cm` | 26 + 8 | `ü — &kp RA(Y)` | X + U · Colemak only |
+| `combo_oe_qw` | 26 + 9 | `ö — &kp RA(P)` | X + O · QWERTY + FUSION |
+| `combo_ue_qw` | 26 + 7 | `ü — &kp RA(Y)` | X + U · QWERTY + FUSION |
 
 ![Layer overview — Corneish Zen · 42 keys](docs/keymap-zen.svg)
 
 ### Tractyl · 33 keys
-Source: `config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 6 combos`
+Source: `config/tracktyl.keymap + shields/tracktyl/tracktyl.dtsi transform (3×10 + 3 thumbs) · 33 keys (pos 0–32) · 8 layers · 12 combos`
 
-**Combos (Tractyl · 33 keys)** — all 50 ms timeout
+**Combos (Tractyl · 33 keys)** — 50 ms timeout unless noted
 
 | Name | Keys (pos) | Output | Note |
 |---|---|---|---|
 | `combo_esc` | 0 + 1 | `ESC` | Q + W |
-| `combo_middleclick` | 12 + 13 | `&mlt 2 MCLK (tap MCLK / hold MOUSE)` | homerow S+T position pair |
+| `combo_middleclick` | 12 + 13 | `&mlt 2 MCLK (tap MCLK / hold LOWER)` | **scroll combo** — holding it puts the trackball in vertical scroll |
 | `combo_middlepress` | 16 + 17 | `&mkp MCLK` | N+E position pair |
 | `combo_bootload` | 0 + 30 | `&bootloader` | Q + LOWER/Space thumb |
 | `combo_sysreset` | 0 + 24 | `&sys_reset` | Q + B |
 | `combo_base_flip` | 0 + 9 | `&tog BASE_QWERTY (flip-flop)` | Q + ; — toggles Colemak ↔ QWERTY |
+| `combo_ae` | 21 + 10 | `ä — &kp RA(Q)` | X + A · both bases · **40 ms** ("ax" is a real bigram) |
+| `combo_ss` | 21 + 20 | `ß — &kp RA(S)` | X + Z · both bases · Z not S ("sz"); QWERTY S shares the ring finger with X |
+| `combo_oe_cm` | 21 + 19 | `ö — &kp RA(P)` | X + O · Colemak only |
+| `combo_ue_cm` | 21 + 7 | `ü — &kp RA(Y)` | X + U · Colemak only |
+| `combo_oe_qw` | 21 + 8 | `ö — &kp RA(P)` | X + O · QWERTY + FUSION |
+| `combo_ue_qw` | 21 + 6 | `ü — &kp RA(Y)` | X + U · QWERTY + FUSION |
 
 ![Layer overview — Tractyl · 33 keys](docs/keymap-tractyl.svg)
 
@@ -128,7 +161,6 @@ visible. Classes: `charging` / `discharging` / `absent`.
   firmware-detectable, and claiming otherwise would be wrong.
 - **Over USB there's nothing at all**: ZMK implements no HID battery page, so this is
   a BLE-only signal.
-
 
 ## Build pipelines (4 workflows)
 
