@@ -62,6 +62,17 @@ config ZMK_CHARGE_STATE_REPORTING
       state over the split link. Plain BAS (0x2A19) carries a level only, which
       is why this is needed at all.
 
+config ZMK_USB_BATTERY_REPORTING
+    bool "Report central battery level and charge state over USB HID"
+    depends on ZMK_USB && ZMK_BATTERY_REPORTING
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    help
+      Adds a second USB HID interface without changing ZMK's keyboard reports.
+      Also set USB_HID_DEVICE_COUNT=2. Linux generic HID exposes the level as a
+      device battery; Linux 6.3+ also supports its Charging usage. Charging is
+      inferred from USB power, not a charger-status measurement. Reports the
+      central half only and does not require BLE or the BLE reporting option.
+
 DT_COMPAT_ZMK_BOOT_MAGIC_KEY := zmk,boot-magic-key
 
 config ZMK_BOOT_MAGIC_KEY

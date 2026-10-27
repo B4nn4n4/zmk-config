@@ -51,7 +51,7 @@ no local toolchain here.
   bindings itself. Never convert back to separate files. Custom behavior nodes live
   in the keymap overlay (ZMK compiles keymaps against a stub dts — board dts nodes
   are NOT visible there)
-- `src/charge_state.c` — the one cross-board module here (Zen and Tractyl build it too):
+- `src/charge_state.c` — shared across boards (Zen and Tractyl build it too):
   drives Zephyr's BAS 1.1 Battery Level Status characteristic (`0x2BED`) from
   `zmk_usb_is_powered()` so the BLE host can show charging state. Gated by
   `CONFIG_ZMK_CHARGE_STATE_REPORTING`, central-only. Its `SYS_INIT` only QUEUES the
@@ -60,6 +60,17 @@ no local toolchain here.
   has returned, so queueing is what makes it clobber-proof. Because it is
   shared, `build-zen.yml` / `build-tractyl.yml` watch `src/charge_state.c`, `Kconfig`
   and `CMakeLists.txt` in addition to their own config paths
+- `src/usb_battery.c` — shared central-only USB battery telemetry, gated by
+  `CONFIG_ZMK_USB_BATTERY_REPORTING` (independent of BLE). All three central configs
+  also set `CONFIG_USB_HID_DEVICE_COUNT=2`. Owns `HID_1`; never touch ZMK's `HID_0`
+  reports or call `usb_enable()` again. Registers at `CONFIG_ZMK_USB_HID_INIT_PRIORITY`
+  before ZMK enables USB. Report ID 1: percent, Charging bit, always-zero Consumer
+  Mute byte; this input capability prevents Linux discarding the battery interface.
+  Uses two persistent RAM buffers, advancing only when the driver accepts a write,
+  so pending DMA remains intact and aborted transfers cannot strand a semaphore.
+  Reports on USB/battery events and every 30 s; never wakes suspended USB.
+  Zen/Tractyl workflows watch this file too. Local regression tests:
+  `python3 -m unittest discover -s tests/usb_battery -v` (Python + GCC required).
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)

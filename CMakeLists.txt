@@ -10,3 +10,4 @@ target_sources_ifdef(CONFIG_ZMK_BATTERY_INDICATOR app PRIVATE src/behaviors/beha
 target_sources_ifdef(CONFIG_ZMK_BATTERY_INDICATOR app PRIVATE src/behaviors/behavior_layer_color.c)
 target_sources_ifdef(CONFIG_ZMK_BOOT_MAGIC_KEY app PRIVATE src/boot_magic_key.c)
 target_sources_ifdef(CONFIG_ZMK_CHARGE_STATE_REPORTING app PRIVATE src/charge_state.c)
+target_sources_ifdef(CONFIG_ZMK_USB_BATTERY_REPORTING app PRIVATE src/usb_battery.c)
