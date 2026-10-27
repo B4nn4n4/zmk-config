@@ -140,6 +140,73 @@ flag):
 Empty `text` when on battery, so the module hides itself; `ZMK_SHOW_IDLE=1` keeps it
 visible. Classes: `charging` / `discharging` / `absent`.
 
+### USB battery reporting
+
+All three central halves also enable `src/usb_battery.c` with:
+
+```conf
+CONFIG_ZMK_USB_BATTERY_REPORTING=y
+CONFIG_USB_HID_DEVICE_COUNT=2
+```
+
+This adds **HID_1**, a separate USB HID interface reporting the central battery's
+percentage and inferred charging state. ZMK's keyboard/mouse/consumer reports
+remain on **HID_0**, and Studio's USB serial interface is unchanged. The USB option
+is independent of BLE and `CONFIG_ZMK_CHARGE_STATE_REPORTING`. Peripheral firmware
+does not enable it.
+
+The numbered Input report is four bytes: `01 percentage charging 00`. Battery
+Strength (usage page `0x06`, usage `0x20`) is the first payload byte, range 0–100;
+Charging (page `0x85`, usage `0x44`) occupies bit 0 of the next byte. The final byte
+is an always-released Consumer Mute bit with padding. This gives Linux an ordinary
+input capability so it does not discard a battery-only interface; it never sends
+a Mute press. `GET_REPORT` returns a fresh snapshot of ZMK's cached battery level
+and USB power state. Interrupt reports run on battery/USB events and every 30
+seconds while configured, with one-second retries on write errors. Suspended USB
+is not woken for telemetry; resume/reconnect restarts reports.
+
+On **Linux 6.3+**, generic HID supports these usages as a device-scoped
+`power_supply` battery with percentage and Charging/Discharging status. UPower can
+consume that battery without a custom GATT reader. Linux **6.17+** also notifies
+charging-state changes immediately; older kernels can need polling. On older
+kernels even unsolicited 0% updates can remain cached until a capacity query.
+Interrupt delivery requires an opened input/hidraw device, normally supplied by
+the desktop input stack; headless hosts may need a reader holding it open. macOS
+and Windows battery UI support is not established. This is not a UPS interface.
+
+The existing `host/waybar-zmk-charging.sh` remains **BLE-only**. For USB, use the
+kernel battery/UPower path. After building and flashing the central firmware,
+verify with Bluetooth disconnected:
+
+```sh
+for battery in /sys/class/power_supply/hid-*-battery; do
+    [ -d "$battery" ] || continue
+    printf '%s\n' "$battery"
+    cat "$battery/capacity" "$battery/status" "$battery/scope"
+done
+upower --enumerate
+```
+
+Find the keyboard's newly added device battery, then inspect its UPower path with
+`upower --show-info <path>`. Check typing, mouse reports and Studio still work;
+check suspend/resume and unplug/replug, including with a different percentage.
+The USB battery **disappears on unplug**: it cannot report discharging over a
+removed cable. BLE reporting is still needed for wireless status. At 100%, UPower
+may display FullyCharged even though the firmware's VBUS-based flag remains set.
+
+Local regression tests compile the actual module against API stubs and parse its
+HID descriptor (no firmware toolchain or external Python packages needed):
+
+```sh
+python3 -m unittest discover -s tests/usb_battery -v
+# Or, when Python/GCC are not installed:
+nix shell nixpkgs#python3 nixpkgs#gcc --command python3 -m unittest discover -s tests/usb_battery -v
+```
+
+See `tests/usb_battery/README.md` for coverage, limitations and FHS/Nix environment
+troubleshooting. These tests do not replace a Zephyr firmware build or USB
+enumeration on hardware.
+
 ### Limitations
 
 - **Central (left) half only** — not a hard limit, just not built. In practice the
@@ -157,16 +224,20 @@ visible. Classes: `charging` / `discharging` / `absent`.
 - **"Charging" means VBUS present.** No board here has a charger-status interface, so
   a full battery left plugged in still reads as charging. Same signal the on-keyboard
   indicator uses.
-- **Qi charging is reported as `UNKNOWN`**, not "not connected" — it isn't
-  firmware-detectable, and claiming otherwise would be wrong.
-- **Over USB there's nothing at all**: ZMK implements no HID battery page, so this is
-  a BLE-only signal.
+- **Qi charging is not firmware-detectable.** The BLE wireless-power-source field
+  reports `UNKNOWN`, not "not connected". The USB Charging bit only reflects VBUS;
+  it cannot encode a separate Qi/unknown state.
+- **USB reports require a data connection**, not a charge-only cable. USB reports
+  contain only the central battery; the separate BLE signal remains available
+  without a USB host connection.
 
 ## Build pipelines (4 workflows)
 
 - `build-hatsu.yml` → `build-hatsu.yaml` — triggers on `config/hatsu*`, `boards/**`, `dts/**`, `drivers/**`, `src/**`
 - `build-zen.yml` → `build-zen.yaml` — triggers on `config/corneish_zen.keymap`, `config/corneish_zen*.conf`
 - `build-tractyl.yml` → `build-tractyl.yaml` — triggers on `config/tracktyl*`, `config/boards/shields/tracktyl/**`
+- Zen and Tractyl also watch the shared charge-state sources (`src/charge_state.c`,
+  `src/usb_battery.c`), `Kconfig` and `CMakeLists.txt`.
 - `build-all.yml` → `build.yaml` (all boards + `settings_reset`) — **unified trigger** for central changes: `config/layouts/**`, `config/behaviors/**`, `config/west.yml`, `build*.yaml`, `.github/workflows/**`
 
 Each uses `zmkfirmware/zmk/.github/workflows/build-user-config.yml@main` with `build_matrix_path` + `config_path: config`. `workflow_dispatch` available.
