@@ -179,6 +179,12 @@ the peripheral USB stack. **VBUS wiring on these boards is still unverified**:
 test the right cable both connected and disconnected before treating the flag as
 reliable. No charger-current/termination or Qi detection is available.
 
+Reset images disable BLE but can retain the keymap's telemetry DT nodes. Their
+input-split proxy still needs the virtual source device. CMake therefore includes
+`src/split_battery.c` based on DT presence; only its telemetry runtime is gated by
+`CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY`. The inert device remains defined without
+starting telemetry work or pulling BLE dependencies into a reset build.
+
 The numbered Input report is four bytes: `01 (percentage+1) charging 00`. Battery
 Strength (usage page `0x06`, usage `0x20`) is the first payload byte, logical range
 1–101. Linux scales this exactly back to 0–100%, avoiding older kernels' rejection

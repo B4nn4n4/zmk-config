@@ -10,15 +10,30 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/init.h>
+#include <zephyr/sys/util.h>
+
+#define TELEMETRY_SOURCE DT_DRV_INST(0)
+
+BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
+             "Split battery telemetry needs exactly one virtual source");
+
+/* The source exists on both roles; only the peripheral emits input events.
+ * Keep its device definition even when telemetry is disabled: settings_reset
+ * turns BLE off but can retain the DT input proxy and its DEVICE_DT_GET source
+ * reference. This inert source needs neither INPUT nor BLE initialization.
+ */
+DEVICE_DT_DEFINE(TELEMETRY_SOURCE, NULL, NULL, NULL, NULL, POST_KERNEL,
+                 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, NULL);
+
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY)
+
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
-#include <zephyr/sys/util.h>
 
 #include <zmk/events/split_battery_state_changed.h>
 #include <zmk/split_battery.h>
 #include <zmk/workqueue.h>
 
-#define TELEMETRY_SOURCE DT_DRV_INST(0)
 #define TELEMETRY_PROXY DT_NODELABEL(split_battery_proxy)
 #define TELEMETRY_REG 254
 #define POLL_MS 1000
@@ -34,8 +49,6 @@
 #define PACKET_CHARGING BIT(7)
 #define PACKET_LEVEL_MASK 0x7FU
 
-BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
-             "Split battery telemetry needs exactly one virtual source");
 BUILD_ASSERT(IS_ENABLED(CONFIG_ZMK_INPUT_SPLIT), "Split battery telemetry needs input-split");
 BUILD_ASSERT(DT_NODE_HAS_COMPAT(TELEMETRY_PROXY, zmk_input_split),
              "Split battery telemetry needs its dedicated input proxy");
@@ -43,10 +56,6 @@ BUILD_ASSERT(DT_REG_ADDR(TELEMETRY_PROXY) == TELEMETRY_REG,
              "Split battery input reg 254 is reserved for telemetry");
 BUILD_ASSERT(DT_SAME_NODE(DT_PHANDLE(TELEMETRY_PROXY, device), TELEMETRY_SOURCE),
              "Split battery proxy must use the virtual telemetry source");
-
-/* The source exists on both roles; only the peripheral emits input events. */
-DEVICE_DT_DEFINE(TELEMETRY_SOURCE, NULL, NULL, NULL, NULL, POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,
-                 NULL);
 
 ZMK_EVENT_IMPL(zmk_split_battery_state_changed);
 
@@ -279,3 +288,5 @@ static int split_battery_init(void) {
 }
 
 SYS_INIT(split_battery_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+
+#endif /* CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY */

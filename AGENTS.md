@@ -88,9 +88,12 @@ no local toolchain here.
   dedicated proxy callback; never attach a normal input listener/processors or
   encode state in stock BAS battery bytes. Opt-in is the DT include
   `config/telemetry/split_battery.dtsi` in all three shared keymaps. Both halves
-  must be flashed. Kconfig enables the module only with its DT source, so
-  `settings_reset` does not require telemetry nodes. It selects `ZMK_POINTING`
-  because upstream nests input-split under pointing; HID_0 may gain pointing
+  must be flashed. Compile this file whenever its DT source is enabled, even if
+  the telemetry runtime option is off. `settings_reset` disables BLE but can keep
+  the keymap's input-split proxy, which still references the virtual source device.
+  Keep the inert DEVICE_DT_DEFINE outside the runtime gate and use the generic
+  kernel init priority, not an INPUT-only symbol. Runtime telemetry selects
+  `ZMK_POINTING` because upstream nests input-split under pointing; HID_0 may gain pointing
   capabilities on previously non-pointing builds. Peripheral polls raw nRF VBUS
   each second and sends changes/10-second heartbeats; central validates packets
   and expires the cache after 35 seconds. Hidden behavior `sbat` sends a fresh

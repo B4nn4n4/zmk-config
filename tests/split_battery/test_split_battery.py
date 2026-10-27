@@ -116,6 +116,7 @@ class SplitBatteryTests(unittest.TestCase):
                 "-Wextra",
                 "-Werror",
                 "-Wno-unused-parameter",
+                "-DCONFIG_ZMK_SPLIT_BATTERY_TELEMETRY=1",
                 "-I", str(cls.build),
                 "-I", str(HERE),
                 "-I", str(ROOT),
@@ -257,12 +258,14 @@ class SplitBatteryTests(unittest.TestCase):
         self.assertIn('compatible: "zmk,behavior-split-battery-session"', binding)
         self.assertIn("include: two_param.yaml", binding)
         cmake = (ROOT / "CMakeLists.txt").read_text()
-        for source in ("src/split_battery.c", "src/behaviors/behavior_split_battery.c"):
-            self.assertIn(
-                "target_sources_ifdef(CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY app PRIVATE "
-                + source + ")",
-                cmake,
-            )
+        self.assertIn(
+            "target_sources_ifdef(CONFIG_DT_HAS_ZMK_SPLIT_BATTERY_SOURCE_ENABLED app PRIVATE "
+            "src/split_battery.c)", cmake,
+        )
+        self.assertIn(
+            "target_sources_ifdef(CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY app PRIVATE "
+            "src/behaviors/behavior_split_battery.c)", cmake,
+        )
 
     def test_role_isolated_link_and_preprocessor_api_symbols(self):
         # Builds already link without any opposite-role API definitions. Their

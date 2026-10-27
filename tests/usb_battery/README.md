@@ -35,9 +35,11 @@ The main binary uses `CONFIG_USB_HID_DEVICE_COUNT=3` and
 undefined (Kconfig `n`, not a macro defined as zero). It runs the single-interface
 initialization, error, report, gating, retry, buffer-lifetime, and scheduling cases
 and checks the descriptor. The fake peer getter must never be called in that binary.
-A third binary keeps count three but omits telemetry, matching a central
-`settings_reset` build without telemetry DT nodes. It still reports the central
-battery, withholds peer Input reports, returns unavailable peer Feature data, and
+A third binary keeps count three but omits runtime telemetry, matching a central
+`settings_reset` build with BLE disabled. Reset builds can retain the telemetry DT
+nodes; the separate split tests cover that virtual-device linkage. It still
+reports the central battery, withholds peer Input reports, returns unavailable
+peer Feature data, and
 never calls the absent peer API.
 
 Coverage includes:

@@ -24,8 +24,11 @@ python3 -B -m unittest discover -s tests/split_battery -v
 Each scenario runs in a fresh process so production static state starts clean.
 The suite builds the central role and two peripheral variants, with USB/BLE
 configuration flags both disabled and both enabled. Peripheral scenarios run in
-both variants. Builds use `-Wall -Wextra -Werror` and no optimization, and provide
-no implementations for opposite-role APIs. Role-specific fake headers reject
+both variants. These role harnesses explicitly enable the telemetry runtime to
+isolate its logic; the USB/BLE flag variants are API-isolation checks, not complete
+Kconfig-valid reset configurations. Disabled-runtime builds are tested separately
+below. Builds use `-Wall -Wextra -Werror` and no optimization, and provide no
+implementations for opposite-role APIs. Role-specific fake headers reject
 wrong-role imports. Preprocessed-source checks also guard against central
 battery/nRF dependencies, peripheral connection/event-accessor/random/central
 transport dependencies, and USB API dependencies. A comment-stripped source
@@ -77,6 +80,24 @@ check catches USB config tokens that preprocessing would otherwise erase.
 - Queue errors on the first packet, a change, or a heartbeat retry on the next
   poll without marking unsuccessful packets as sent. Levels above 100 never
   transmit, even when a heartbeat is overdue.
+
+## Disabled-runtime device linkage
+
+`test_disabled_build.py` compiles the real `src/split_battery.c` separately with
+BLE off and telemetry either undefined or explicitly zero, for both roles. Only
+four minimal generic Zephyr headers are supplied. No INPUT, Bluetooth, kernel
+runtime, ZMK runtime headers, or INPUT init-priority symbol is available.
+
+Unlike the normal role harness, its `DEVICE_DT_DEFINE` mock emits an externally
+linked device object. A separate proxy translation unit references the modeled
+`__device_dts_ord_196` symbol and must link and run. Four negative controls omit
+the source and require an undefined-device link error. The test also parses the
+production CMake source gate and models it with the DT node enabled and runtime
+disabled, so changing the source back to the runtime gate breaks the regression.
+
+This models the device-reference contract, not actual CMake execution, generated
+Zephyr device ordinals, or an end-to-end firmware link. Reset builds may retain
+keymap source/proxy nodes even though their BLE telemetry runtime is disabled.
 
 ## Limits
 

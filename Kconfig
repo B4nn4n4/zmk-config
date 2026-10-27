@@ -74,7 +74,9 @@ config ZMK_SPLIT_BATTERY_TELEMETRY
       key or pointer reports. The central caches one peripheral with a timeout.
       Charging is inferred from raw USB VBUS, not charge current or Qi state;
       the board's VBUS wiring must be verified on hardware. Keymaps opt in by
-      including telemetry/split_battery.dtsi; settings_reset does not opt in.
+      including telemetry/split_battery.dtsi. Reset builds disable BLE telemetry
+      but can retain these nodes, so the inert virtual source device must still
+      be compiled based on DT presence rather than this runtime option.
 
 config ZMK_USB_BATTERY_REPORTING
     bool "Report keyboard battery levels and charge states over USB HID"
