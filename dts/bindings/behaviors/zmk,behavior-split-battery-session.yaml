@@ -1,0 +1,5 @@
+description: Private split battery session challenge receiver
+
+compatible: "zmk,behavior-split-battery-session"
+
+include: two_param.yaml

@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Virtual input source for split battery telemetry. Emits only private MSC
+  packets to a zmk,input-split proxy; do not attach a zmk,input-listener.
+
+compatible: "zmk,split-battery-source"
+
+include: [base.yaml]

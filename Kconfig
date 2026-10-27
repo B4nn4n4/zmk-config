@@ -62,16 +62,35 @@ config ZMK_CHARGE_STATE_REPORTING
       state over the split link. Plain BAS (0x2A19) carries a level only, which
       is why this is needed at all.
 
+config ZMK_SPLIT_BATTERY_TELEMETRY
+    bool "Send split battery level and wired-power state over a dedicated input channel"
+    default y if DT_HAS_ZMK_SPLIT_BATTERY_SOURCE_ENABLED
+    depends on DT_HAS_ZMK_SPLIT_BATTERY_SOURCE_ENABLED
+    depends on ZMK_SPLIT && ZMK_SPLIT_BLE && ZMK_BATTERY_REPORTING && SOC_NRF52840
+    select ZMK_POINTING
+    help
+      Sends private MSC packets from a virtual input source through input-split
+      reg 254. No input listener is attached, so telemetry cannot generate
+      key or pointer reports. The central caches one peripheral with a timeout.
+      Charging is inferred from raw USB VBUS, not charge current or Qi state;
+      the board's VBUS wiring must be verified on hardware. Keymaps opt in by
+      including telemetry/split_battery.dtsi. Reset builds disable BLE telemetry
+      but can retain these nodes, so the inert virtual source device must still
+      be compiled based on DT presence rather than this runtime option.
+
 config ZMK_USB_BATTERY_REPORTING
-    bool "Report central battery level and charge state over USB HID"
+    bool "Report keyboard battery levels and charge states over USB HID"
     depends on ZMK_USB && ZMK_BATTERY_REPORTING
     depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
     help
-      Adds a second USB HID interface without changing ZMK's keyboard reports.
-      Also set USB_HID_DEVICE_COUNT=2. Linux generic HID exposes the level as a
-      device battery; Linux 6.3+ also supports its Charging usage. Charging is
-      inferred from USB power, not a charger-status measurement. Reports the
-      central half only and does not require BLE or the BLE reporting option.
+      HID_1 reports the central battery; HID_2 reports the peripheral when split
+      battery telemetry is enabled. Set USB_HID_DEVICE_COUNT=3 for both halves,
+      or 2 for central-only reporting. Linux generic HID exposes device batteries;
+      Linux 6.3+ also supports their Charging usage. Charging is inferred from
+      each half's USB power, not charger current. Unknown/stale peer samples are
+      withheld; generic host drivers can still cache an earlier reading. Feature
+      report 2 includes explicit validity for raw readers. Central reporting does
+      not require BLE or the BLE reporting option; the split relay requires BLE.
 
 DT_COMPAT_ZMK_BOOT_MAGIC_KEY := zmk,boot-magic-key
 

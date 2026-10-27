@@ -6,7 +6,9 @@
 #include <stdint.h>
 
 #define CONFIG_ZMK_LOG_LEVEL 4
-#define CONFIG_USB_HID_DEVICE_COUNT 2
+#ifndef CONFIG_USB_HID_DEVICE_COUNT
+#define CONFIG_USB_HID_DEVICE_COUNT 3
+#endif
 #define CONFIG_HID_INTERRUPT_EP_MPS 64
 #define CONFIG_ZMK_USB_HID_INIT_PRIORITY 50
 #define CONFIG_ZMK_USB_INIT_PRIORITY 60
@@ -47,6 +49,8 @@ void usb_hid_register_device(const struct device *dev, const uint8_t *desc, size
 int usb_hid_init(const struct device *dev);
 int hid_int_ep_write(const struct device *dev, const uint8_t *data, uint32_t size,
                      uint32_t *written);
+struct zmk_split_battery_state { uint8_t level; bool charging; };
+bool zmk_split_battery_get_peer(struct zmk_split_battery_state *state);
 uint8_t zmk_battery_state_of_charge(void);
 bool zmk_usb_is_powered(void);
 bool zmk_usb_is_hid_ready(void);

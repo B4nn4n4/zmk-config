@@ -53,7 +53,13 @@ class BuildWorkflowsTest(unittest.TestCase):
     def test_shared_changes(self):
         for path in ["config/layouts/alphas.h", "config/behaviors/homerow.dtsi",
                      "config/combos/umlauts.dtsi", "config/west.yml",
-                     "src/charge_state.c", "src/usb_battery.c", "Kconfig", "CMakeLists.txt",
+                     "src/charge_state.c", "src/usb_battery.c", "src/split_battery.c",
+                     "src/behaviors/behavior_split_battery.c",
+                     "config/telemetry/split_battery.dtsi", "include/zmk/split_battery.h",
+                     "include/zmk/events/split_battery_state_changed.h",
+                     "dts/bindings/zmk,split-battery-source.yaml",
+                     "dts/bindings/behaviors/zmk,behavior-split-battery-session.yaml",
+                     "Kconfig", "CMakeLists.txt",
                      "zephyr/module.yml", "build.yaml", ".github/build-filters.yml",
                      ".github/workflows/build-zen.yml"]:
             with self.subTest(path=path):

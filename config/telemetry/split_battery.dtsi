@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: MIT */
+
+/ {
+    behaviors {
+        /* Hidden, directly invoked over split transport; never bound to a key. */
+        split_battery_session: sbat {
+            compatible = "zmk,behavior-split-battery-session";
+            #binding-cells = <2>;
+        };
+    };
+
+    split_battery_source: split-battery-source {
+        compatible = "zmk,split-battery-source";
+    };
+
+    split_battery_transport {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        /* Reserved telemetry channel, separate from all pointing devices. */
+        split_battery_proxy: input@fe {
+            compatible = "zmk,input-split";
+            reg = <254>;
+            device = <&split_battery_source>;
+        };
+    };
+};
