@@ -231,16 +231,43 @@ enumeration on hardware.
   contain only the central battery; the separate BLE signal remains available
   without a USB host connection.
 
-## Build pipelines (4 workflows)
+## Build pipelines
 
-- `build-hatsu.yml` → `build-hatsu.yaml` — triggers on `config/hatsu*`, `boards/**`, `dts/**`, `drivers/**`, `src/**`
-- `build-zen.yml` → `build-zen.yaml` — triggers on `config/corneish_zen.keymap`, `config/corneish_zen*.conf`
-- `build-tractyl.yml` → `build-tractyl.yaml` — triggers on `config/tracktyl*`, `config/boards/shields/tracktyl/**`
-- Zen and Tractyl also watch the shared charge-state sources (`src/charge_state.c`,
-  `src/usb_battery.c`), `Kconfig` and `CMakeLists.txt`.
-- `build-all.yml` → `build.yaml` (all boards + `settings_reset`) — **unified trigger** for central changes: `config/layouts/**`, `config/behaviors/**`, `config/west.yml`, `build*.yaml`, `.github/workflows/**`
+`build-all.yml` is the only automatic entry point for pushes and pull requests.
+It checks `.github/build-filters.yml` and calls each affected board workflow once:
 
-Each uses `zmkfirmware/zmk/.github/workflows/build-user-config.yml@main` with `build_matrix_path` + `config_path: config`. `workflow_dispatch` available.
+- Shared layouts, behaviors, combos, manifest, charge-state sources
+  (`src/charge_state.c`, `src/usb_battery.c`), module metadata, build-system files,
+  or `.github/**` changes → all three boards, including Hatsu.
+- Board-only changes → only affected boards, even when several boards change together.
+- Shared plus board-only changes → all three boards, with no duplicate board jobs.
+- Unrelated changes → path check only; no firmware builds.
+
+Board workflows are reusable and also support manual `workflow_dispatch` runs:
+
+- `build-hatsu.yml` → `build-hatsu.yaml` (includes Hatsu `settings_reset` images).
+- `build-zen.yml` → `build-zen.yaml`.
+- `build-tractyl.yml` → `build-tractyl.yaml`.
+
+Selected board pipelines run sequentially: Hatsu, then Zen, then Tractyl. ZMK's
+upstream artifact merge reads run-wide inputs, so parallel board pipelines can
+interfere with each other's artifact downloads. Each board waits for the previous
+pipeline, including its merge job. Skipped boards do not block selected boards;
+a failed pipeline stops later boards to avoid merging incomplete leftovers.
+Builds within one board's matrix can still run in parallel.
+
+Manual **Build All** selects all three board workflows. `build-hatsu-debug.yml` and
+`build-reset.yml` remain manual-only. Manually requested runs are independent;
+they are not deduplicated against automatic runs. `build.yaml` is a legacy Zen +
+Tractyl matrix; the automatic workflow uses the three board-specific matrices.
+
+Each board workflow uses `zmkfirmware/zmk/.github/workflows/build-user-config.yml@main`
+with `build_matrix_path` + `config_path: config`. Artifacts keep their board-specific
+names: `hatsu-firmware`, `zen-firmware`, and `tractyl-firmware`.
+
+Local routing tests (Python with PyYAML):
+`python3 -m unittest discover -s tests -v`. Check workflow syntax with
+`actionlint .github/workflows/*.yml`.
 
 Local history from `zmk-config-hatsu` (MiaoBreak credits), `zmk-config-zen-2`, `zmk-config-tractyl` merged.
 

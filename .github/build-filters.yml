@@ -1,0 +1,41 @@
+# Shared inputs take precedence over individual board matches. Each selected board
+# has exactly one job in build-all.yml, even when both filters match.
+shared:
+  - 'config/layouts/**'
+  - 'config/behaviors/**'
+  - 'config/combos/**'
+  - 'config/west.yml'
+  - 'src/charge_state.c'
+  - 'src/usb_battery.c'
+  - 'Kconfig'
+  - 'CMakeLists.txt'
+  - 'zephyr/**'
+  - 'build.yaml'
+  - '.github/**'
+
+hatsu:
+  - 'config/hatsu_left.keymap'
+  - 'config/hatsu_right.keymap'
+  - 'config/hatsu_left.conf'
+  - 'config/hatsu_right.conf'
+  - 'boards/**'
+  - 'dts/**'
+  - 'drivers/**'
+  - 'src/**'
+  - 'include/**'
+  - 'build-hatsu.yaml'
+
+zen:
+  - 'config/corneish_zen.keymap'
+  - 'config/corneish_zen*.conf'
+  - 'build-zen.yaml'
+
+tractyl:
+  - 'config/tracktyl.keymap'
+  - 'config/tracktyl_left.keymap'
+  - 'config/tracktyl_right.keymap'
+  - 'config/tracktyl.conf'
+  - 'config/tracktyl_left.conf'
+  - 'config/tracktyl_right.conf'
+  - 'config/boards/shields/tracktyl/**'
+  - 'build-tractyl.yaml'

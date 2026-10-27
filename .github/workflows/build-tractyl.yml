@@ -1,33 +1,6 @@
 name: Build Tractyl
 on:
-  push:
-    paths:
-      - 'config/tracktyl.keymap'
-      - 'config/tracktyl_left.keymap'
-      - 'config/tracktyl_right.keymap'
-      - 'config/tracktyl.conf'
-      - 'config/tracktyl_left.conf'
-      - 'config/tracktyl_right.conf'
-      - 'config/boards/shields/tracktyl/**'
-      - 'src/charge_state.c'
-      - 'src/usb_battery.c'
-      - 'Kconfig'
-      - 'CMakeLists.txt'
-      - 'build-tractyl.yaml'
-  pull_request:
-    paths:
-      - 'config/tracktyl.keymap'
-      - 'config/tracktyl_left.keymap'
-      - 'config/tracktyl_right.keymap'
-      - 'config/tracktyl.conf'
-      - 'config/tracktyl_left.conf'
-      - 'config/tracktyl_right.conf'
-      - 'config/boards/shields/tracktyl/**'
-      - 'src/charge_state.c'
-      - 'src/usb_battery.c'
-      - 'Kconfig'
-      - 'CMakeLists.txt'
-      - 'build-tractyl.yaml'
+  workflow_call:
   workflow_dispatch:
 
 jobs:

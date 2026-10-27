@@ -1,26 +1,61 @@
 name: Build All
 # Unified trigger for central changes — builds every board
+# One automatic entry point: shared changes select all boards; other changes select
+# only affected boards. The individual workflows remain available for manual runs.
 on:
   push:
-    paths:
-      - 'config/layouts/**'
-      - 'config/behaviors/**'
-      - 'config/west.yml'
-      - 'build.yaml'
-      - '.github/workflows/**'
   pull_request:
-    paths:
-      - 'config/layouts/**'
-      - 'config/behaviors/**'
-      - 'config/west.yml'
-      - 'build.yaml'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
-    with:
-      build_matrix_path: build.yaml
-      config_path: config
-      archive_name: firmware
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      shared: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.shared == 'true' }}
+      hatsu: ${{ steps.filter.outputs.hatsu }}
+      zen: ${{ steps.filter.outputs.zen }}
+      tractyl: ${{ steps.filter.outputs.tractyl }}
+    steps:
+      # Pull requests use the paginated changed-files API, including fork PRs.
+      # Pushes compare against the state before this push (not main).
+      - uses: actions/checkout@v4
+        if: github.event_name != 'workflow_dispatch'
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          base: ${{ github.ref }}
+          filters: .github/build-filters.yml
+
+  # Upstream artifact merges use run-wide inputs, not just their caller's board.
+  # Serialize entire pipelines so a merge cannot race another board's uploads or
+  # merge. Allow skipped boards, but stop after failures to avoid merging leftovers.
+  hatsu:
+    needs: changes
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.hatsu == 'true')
+    uses: ./.github/workflows/build-hatsu.yml
+
+  zen:
+    needs: [changes, hatsu]
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.zen == 'true')
+    uses: ./.github/workflows/build-zen.yml
+
+  tractyl:
+    needs: [changes, hatsu, zen]
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.tractyl == 'true')
+    uses: ./.github/workflows/build-tractyl.yml
