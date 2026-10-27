@@ -249,6 +249,13 @@ Board workflows are reusable and also support manual `workflow_dispatch` runs:
 - `build-zen.yml` → `build-zen.yaml`.
 - `build-tractyl.yml` → `build-tractyl.yaml`.
 
+Selected board pipelines run sequentially: Hatsu, then Zen, then Tractyl. ZMK's
+upstream artifact merge reads run-wide inputs, so parallel board pipelines can
+interfere with each other's artifact downloads. Each board waits for the previous
+pipeline, including its merge job. Skipped boards do not block selected boards;
+a failed pipeline stops later boards to avoid merging incomplete leftovers.
+Builds within one board's matrix can still run in parallel.
+
 Manual **Build All** selects all three board workflows. `build-hatsu-debug.yml` and
 `build-reset.yml` remain manual-only. Manually requested runs are independent;
 they are not deduplicated against automatic runs. `build.yaml` is a legacy Zen +

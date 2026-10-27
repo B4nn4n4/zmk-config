@@ -1,6 +1,7 @@
 """Local routing regression tests. Requires PyYAML; no GitHub access needed."""
 
 import fnmatch
+from itertools import combinations
 from pathlib import Path
 import unittest
 
@@ -90,10 +91,16 @@ class BuildWorkflowsTest(unittest.TestCase):
         for board in BOARDS:
             with self.subTest(board=board):
                 job = jobs[board]
-                self.assertEqual(job["needs"], "changes")
-                self.assertEqual(job["if"],
-                                 "needs.changes.outputs.shared == 'true' || "
-                                 f"needs.changes.outputs.{board} == 'true'")
+                needs = job["needs"]
+                self.assertIn("changes", [needs] if isinstance(needs, str) else needs)
+                # A status function overrides GitHub's implicit success() check:
+                # otherwise skipping Hatsu would also skip a Zen-only build.
+                self.assertEqual(" ".join(job["if"].split()),
+                                 "!cancelled() && "
+                                 "needs.changes.result == 'success' && "
+                                 "!contains(needs.*.result, 'failure') && "
+                                 "(needs.changes.outputs.shared == 'true' || "
+                                 f"needs.changes.outputs.{board} == 'true')")
                 path = f".github/workflows/build-{board}.yml"
                 self.assertEqual(job["uses"], f"./{path}")
                 child = load_yaml(path)
@@ -101,6 +108,26 @@ class BuildWorkflowsTest(unittest.TestCase):
                                  {"workflow_call", "workflow_dispatch"})
                 self.assertEqual(child["jobs"]["build"]["with"]["build_matrix_path"],
                                  f"build-{board}.yaml")
+
+    def test_board_pipelines_cannot_overlap(self):
+        jobs = self.workflow["jobs"]
+
+        def ancestors(board, visited=None):
+            visited = set() if visited is None else visited
+            self.assertNotIn(board, visited, "Workflow dependency cycle")
+            needs = jobs[board].get("needs", [])
+            needs = [needs] if isinstance(needs, str) else needs
+            result = set(needs)
+            for dependency in needs:
+                result.update(ancestors(dependency, visited | {board}))
+            return result
+
+        for first, second in combinations(sorted(BOARDS), 2):
+            with self.subTest(first=first, second=second):
+                self.assertTrue(first in ancestors(second) or second in ancestors(first),
+                                "Each board must wait for the other's full pipeline")
+        self.assertEqual(jobs["zen"]["needs"], ["changes", "hatsu"])
+        self.assertEqual(jobs["tractyl"]["needs"], ["changes", "hatsu", "zen"])
 
     def test_manual_all_and_push_comparison(self):
         changes = self.workflow["jobs"]["changes"]

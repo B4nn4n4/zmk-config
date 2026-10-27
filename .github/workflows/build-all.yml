@@ -30,17 +30,32 @@ jobs:
           base: ${{ github.ref }}
           filters: .github/build-filters.yml
 
+  # Upstream artifact merges use run-wide inputs, not just their caller's board.
+  # Serialize entire pipelines so a merge cannot race another board's uploads or
+  # merge. Allow skipped boards, but stop after failures to avoid merging leftovers.
   hatsu:
     needs: changes
-    if: needs.changes.outputs.shared == 'true' || needs.changes.outputs.hatsu == 'true'
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.hatsu == 'true')
     uses: ./.github/workflows/build-hatsu.yml
 
   zen:
-    needs: changes
-    if: needs.changes.outputs.shared == 'true' || needs.changes.outputs.zen == 'true'
+    needs: [changes, hatsu]
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.zen == 'true')
     uses: ./.github/workflows/build-zen.yml
 
   tractyl:
-    needs: changes
-    if: needs.changes.outputs.shared == 'true' || needs.changes.outputs.tractyl == 'true'
+    needs: [changes, hatsu, zen]
+    if: >-
+      !cancelled() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      (needs.changes.outputs.shared == 'true' || needs.changes.outputs.tractyl == 'true')
     uses: ./.github/workflows/build-tractyl.yml

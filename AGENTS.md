@@ -9,6 +9,9 @@ no local toolchain here.
 - Push / pull request → `.github/workflows/build-all.yml` selects affected boards
   using `.github/build-filters.yml`; shared changes build all three boards once.
   Board workflows are reusable and manual-only, with no independent push/PR triggers.
+  Selected pipelines run sequentially (Hatsu → Zen → Tractyl): upstream artifact
+  merges use run-wide inputs. Keep the dependency chain and explicit status checks
+  so skipped boards do not block later selections; failures stop later pipelines.
   Download artifacts into `out/firmware/` with `gh run download <id> -D out`.
 - `build-hatsu.yaml` builds: `hatsu_left//zmk` (with `studio-rpc-usb-uart` snippet),
   `hatsu_right//zmk`, and `settings_reset` images for both halves
