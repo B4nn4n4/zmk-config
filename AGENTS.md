@@ -6,9 +6,11 @@ no local toolchain here.
 
 ## Build & release flow
 
-- Push to `main` → `.github/workflows/build.yml` → artifacts in `out/firmware/` after
-  `gh run download <id> -D out`
-- `build.yaml` builds: `hatsu_left//zmk` (with `studio-rpc-usb-uart` snippet),
+- Push / pull request → `.github/workflows/build-all.yml` selects affected boards
+  using `.github/build-filters.yml`; shared changes build all three boards once.
+  Board workflows are reusable and manual-only, with no independent push/PR triggers.
+  Download artifacts into `out/firmware/` with `gh run download <id> -D out`.
+- `build-hatsu.yaml` builds: `hatsu_left//zmk` (with `studio-rpc-usb-uart` snippet),
   `hatsu_right//zmk`, and `settings_reset` images for both halves
 - CI iteration is the norm: expect a few push/fail/fix cycles; read failures with
   `gh run view <id> --log-failed | grep -i error`
@@ -58,8 +60,8 @@ no local toolchain here.
   update onto the lowprio workqueue: Zephyr's `bas_init()` zeroes the BLS power-state
   bitfield at the same init priority, and work items don't run until every `SYS_INIT`
   has returned, so queueing is what makes it clobber-proof. Because it is
-  shared, `build-zen.yml` / `build-tractyl.yml` watch `src/charge_state.c`, `Kconfig`
-  and `CMakeLists.txt` in addition to their own config paths
+  shared, `.github/build-filters.yml` selects all three board workflows for changes
+  to `src/charge_state.c`, `Kconfig` and `CMakeLists.txt`
 - `src/usb_battery.c` — shared central-only USB battery telemetry, gated by
   `CONFIG_ZMK_USB_BATTERY_REPORTING` (independent of BLE). All three central configs
   also set `CONFIG_USB_HID_DEVICE_COUNT=2`. Owns `HID_1`; never touch ZMK's `HID_0`
@@ -69,8 +71,9 @@ no local toolchain here.
   Uses two persistent RAM buffers, advancing only when the driver accepts a write,
   so pending DMA remains intact and aborted transfers cannot strand a semaphore.
   Reports on USB/battery events and every 30 s; never wakes suspended USB.
-  Zen/Tractyl workflows watch this file too. Local regression tests:
-  `python3 -m unittest discover -s tests/usb_battery -v` (Python + GCC required).
+  `.github/build-filters.yml` selects all three board workflows for this file too.
+  Local regression tests: `python3 -m unittest discover -s tests/usb_battery -v`
+  (Python + GCC required).
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)
