@@ -7,70 +7,101 @@
 #include "stubs.h"
 #include "src/usb_battery.c"
 
-static struct device fake_device;
+#define INTERFACES (CONFIG_USB_HID_DEVICE_COUNT - 1)
+struct endpoint {
+    struct device dev;
+    bool binding_exists, ready;
+    int init_result, send_result, registrations, initializations, sends;
+    const uint8_t *desc;
+    size_t desc_size;
+    const struct hid_ops *ops;
+    const uint8_t *outstanding, *last_attempt;
+    uint8_t outstanding_copy[4];
+};
+static struct endpoint endpoints[2] = {
+    {.binding_exists = true, .ready = true},
+    {.binding_exists = true, .ready = true},
+};
 static struct k_work_q fake_queue;
-static bool binding_exists = true, device_ready = true, hid_ready = true, powered = true;
+static bool hid_ready = true, powered = true, peer_available = true;
 static uint8_t percentage = 53;
+static struct zmk_split_battery_state peer_state = {.level = 79, .charging = false};
 static enum usb_dc_status_code usb_status = USB_DC_CONFIGURED;
-static int init_result, send_result, registrations, initializations, sends, wakeups;
-static int schedules, reschedules;
+static int wakeups, schedules, reschedules, peer_gets;
 static bool pending;
 static k_timeout_t pending_delay, last_schedule;
-static const uint8_t *registered_desc;
-static size_t registered_desc_size;
-static const struct hid_ops *registered_ops;
-static const uint8_t *outstanding;
-static uint8_t outstanding_copy[4];
-static const uint8_t *last_attempt;
 static void (*during_write)(void);
+static int inject_interface;
 
+static int device_index(const struct device *dev) {
+    for (int i = 0; i < INTERFACES; i++) {
+        if (dev == &endpoints[i].dev) { return i; }
+    }
+    abort(); /* HID_0 and unknown devices must never be touched. */
+}
 const struct device *device_get_binding(const char *name) {
-    assert(strcmp(name, "HID_1") == 0);
-    return binding_exists ? &fake_device : NULL;
+    int i = strcmp(name, "HID_1") == 0 ? 0 : strcmp(name, "HID_2") == 0 ? 1 : -1;
+    assert(i >= 0 && i < INTERFACES);
+    return endpoints[i].binding_exists ? &endpoints[i].dev : NULL;
 }
-bool device_is_ready(const struct device *dev) {
-    assert(dev == &fake_device);
-    return device_ready;
-}
+bool device_is_ready(const struct device *dev) { return endpoints[device_index(dev)].ready; }
 void usb_hid_register_device(const struct device *dev, const uint8_t *desc, size_t size,
                              const struct hid_ops *ops) {
-    assert(dev == &fake_device);
-    registrations++;
-    registered_desc = desc;
-    registered_desc_size = size;
-    registered_ops = ops;
+    struct endpoint *ep = &endpoints[device_index(dev)];
+    assert(ep->registrations == 0 && ep->initializations == 0);
+    ep->registrations++;
+    ep->desc = desc;
+    ep->desc_size = size;
+    ep->ops = ops;
 }
 int usb_hid_init(const struct device *dev) {
-    assert(dev == &fake_device);
-    assert(registrations == 1);
-    initializations++;
-    return init_result;
+    struct endpoint *ep = &endpoints[device_index(dev)];
+    assert(ep->registrations == 1 && ep->initializations == 0);
+    ep->initializations++;
+    return ep->init_result;
 }
 static void check_outstanding(void) {
-    if (outstanding) {
-        assert(memcmp(outstanding, outstanding_copy, sizeof(outstanding_copy)) == 0);
+    for (int i = 0; i < INTERFACES; i++) {
+        struct endpoint *ep = &endpoints[i];
+        if (ep->outstanding) {
+            assert(memcmp(ep->outstanding, ep->outstanding_copy, 4) == 0);
+        }
     }
 }
 int hid_int_ep_write(const struct device *dev, const uint8_t *data, uint32_t size,
                      uint32_t *written) {
-    assert(dev == &fake_device);
+    int i = device_index(dev);
+    struct endpoint *ep = &endpoints[i];
     assert(size == 4 && written == NULL);
-    assert(data[0] == 1 && data[1] == (percentage > 100 ? 100 : percentage));
-    assert(data[2] == (powered ? 1 : 0) && data[3] == 0);
+    assert(data[0] == 1 && data[3] == 0);
+    assert(data[1] == 1 + (i ? peer_state.level : (percentage > 100 ? 100 : percentage)));
+    assert(data[2] == (i ? peer_state.charging : powered));
+    assert(!i || peer_available);
     check_outstanding(); /* Detect overwrite before even calling the driver. */
-    sends++;
-    last_attempt = data;
-    if (during_write) {
-        during_write();
+    for (int other = 0; other < INTERFACES; other++) {
+        if (other != i) {
+            assert(data != endpoints[other].last_attempt);
+            assert(data != endpoints[other].outstanding);
+        }
     }
-    if (!send_result) {
-        /* Successful call means the prior transfer completed; retain the new RAM. */
-        outstanding = data;
-        memcpy(outstanding_copy, data, sizeof(outstanding_copy));
+    ep->sends++;
+    ep->last_attempt = data;
+    if (during_write && inject_interface == i) { during_write(); }
+    if (!ep->send_result) {
+        /* Acceptance completes the prior transfer only on this endpoint. */
+        ep->outstanding = data;
+        memcpy(ep->outstanding_copy, data, 4);
     }
-    return send_result;
+    check_outstanding();
+    return ep->send_result;
 }
 uint8_t zmk_battery_state_of_charge(void) { return percentage; }
+bool zmk_split_battery_get_peer(struct zmk_split_battery_state *state) {
+    peer_gets++;
+    /* Deliberately return retained/invalid bytes even when unavailable. */
+    *state = peer_state;
+    return peer_available;
+}
 bool zmk_usb_is_powered(void) { return powered; }
 bool zmk_usb_is_hid_ready(void) { return hid_ready; }
 enum usb_dc_status_code zmk_usb_get_status(void) { return usb_status; }
@@ -80,10 +111,7 @@ int k_work_schedule_for_queue(struct k_work_q *queue, struct k_work_delayable *w
     assert(queue == &fake_queue && work == &usb_battery_work);
     schedules++;
     last_schedule = delay;
-    if (!pending) {
-        pending = true;
-        pending_delay = delay;
-    }
+    if (!pending) { pending = true; pending_delay = delay; }
     return 0;
 }
 int k_work_reschedule_for_queue(struct k_work_q *queue, struct k_work_delayable *work,
@@ -96,68 +124,113 @@ int k_work_reschedule_for_queue(struct k_work_q *queue, struct k_work_delayable 
 }
 int usb_wakeup_request(void) { wakeups++; return 0; }
 
+static int total_sends(void) { return endpoints[0].sends + endpoints[1].sends; }
 static void init_ok(void) {
     assert(registered_init == usb_battery_init);
     assert(registered_init_priority == CONFIG_ZMK_USB_HID_INIT_PRIORITY);
     assert(registered_init() == 0);
-    assert(battery_hid_dev == &fake_device);
-    assert(registrations == 1 && initializations == 1);
-    assert(registered_desc == usb_battery_report_desc);
-    assert(registered_desc_size == sizeof(usb_battery_report_desc));
-    assert(registered_ops == &battery_hid_ops);
-    assert(registered_ops->get_report == battery_get_report);
+    assert(battery_hid_dev == &endpoints[0].dev);
+    assert(peer_hid_dev == (INTERFACES == 2 ? &endpoints[1].dev : NULL));
+    for (int i = 0; i < INTERFACES; i++) {
+        struct endpoint *ep = &endpoints[i];
+        assert(ep->registrations == 1 && ep->initializations == 1);
+        assert(ep->desc == usb_battery_report_desc && ep->desc_size == sizeof(usb_battery_report_desc));
+        assert(ep->ops == &battery_hid_ops && ep->ops->get_report == battery_get_report);
+    }
     assert(reschedules == 1 && schedules == 0 && pending && pending_delay == 0);
-    assert(sends == 0 && wakeups == 0);
+    assert(total_sends() == 0 && wakeups == 0);
 }
 static void run_work(void) {
     pending = false; /* Zephyr dequeues the timeout before invoking its callback. */
     usb_battery_work.work.handler(&usb_battery_work.work);
+    check_outstanding();
+    assert(wakeups == 0);
 }
 static void event(void) {
     zmk_event_t eh = 0;
     assert(registered_listener(&eh) == ZMK_EV_EVENT_BUBBLE);
 }
-static void get_and_check(uint8_t pct, bool charging, uint16_t requested) {
-    percentage = pct;
-    powered = charging;
-    struct usb_setup_packet setup = {.wValue = 0x0101, .wLength = requested};
-    uint8_t *data = NULL;
-    int32_t len = -1;
-    assert(battery_hid_ops.get_report(&fake_device, &setup, &len, &data) == 0);
-    assert(data && len == (requested < 4 ? requested : 4));
-    const uint8_t expected[] = {1, pct > 100 ? 100 : pct, charging ? 1 : 0, 0};
-    assert(memcmp(data, expected, sizeof(expected)) == 0);
-    check_outstanding();
+static void get_and_check(int i, uint16_t selector, uint16_t requested) {
+    struct endpoint *ep = &endpoints[i];
+    struct usb_setup_packet setup = {.wValue = selector, .wLength = requested};
+    uint8_t sentinel = 0xaa, *data = &sentinel;
+    int32_t len = 37;
+    bool available = !i || peer_available;
+    int result = ep->ops->get_report(&ep->dev, &setup, &len, &data);
+    if (selector == 0x0101 && !available) {
+        assert(result == -ENODATA && data == &sentinel && len == 37 && sentinel == 0xaa);
+    } else {
+        assert(result == 0 && data && len == (requested < 4 ? requested : 4));
+        uint8_t pct = i ? peer_state.level : (percentage > 100 ? 100 : percentage);
+        uint8_t charging = i ? peer_state.charging : powered;
+        const uint8_t input[] = {1, pct + 1, charging, 0};
+        const uint8_t feature[] = {2, available, available ? pct : 0, available ? charging : 0};
+        assert(memcmp(data, selector == 0x0101 ? input : feature, 4) == 0);
+    }
+    check_outstanding(); /* EP0 must not touch either interrupt DMA buffer. */
+}
+static void read_all(void) {
+    for (int i = 0; i < INTERFACES; i++) {
+        get_and_check(i, 0x0101, 4);
+        get_and_check(i, 0x0302, 4);
+    }
 }
 static void test_get_report(void) {
+    init_ok();
     const uint8_t levels[] = {0, 1, 53, 99, 100, 101, 255};
     const uint16_t lengths[] = {0, 1, 2, 3, 4, 5, 64, 65535};
     for (size_t p = 0; p < sizeof(levels); p++) {
+        percentage = levels[p];
+        /* Peer API contract guarantees valid available levels, not raw sensor bytes. */
+        peer_state.level = levels[p] > 100 ? 100 : levels[p];
         for (int c = 0; c < 2; c++) {
-            for (size_t l = 0; l < sizeof(lengths) / sizeof(lengths[0]); l++) {
-                get_and_check(levels[p], c, lengths[l]);
+            powered = c;
+            peer_state.charging = !c;
+            for (int available = 0; available < 2; available++) {
+                peer_available = available;
+                for (size_t l = 0; l < sizeof(lengths) / sizeof(lengths[0]); l++) {
+                    for (int i = 0; i < INTERFACES; i++) {
+                        get_and_check(i, 0x0101, lengths[l]);
+                        get_and_check(i, 0x0302, lengths[l]);
+                    }
+                }
             }
         }
     }
-    /* Exhaust the 16-bit report-type/report-ID selector, not only common errors. */
-    for (unsigned value = 0; value <= UINT16_MAX; value++) {
-        if (value == 0x0101) {
-            continue;
+    /* Exhaust the full report-type/report-ID selector on each registered device. */
+    for (int i = 0; i < INTERFACES; i++) {
+        for (unsigned value = 0; value <= UINT16_MAX; value++) {
+            if (value == 0x0101 || value == 0x0302) { continue; }
+            struct usb_setup_packet setup = {.wValue = value, .wLength = 4};
+            uint8_t sentinel = 0xaa, *data = &sentinel;
+            int32_t len = 37;
+            assert(endpoints[i].ops->get_report(&endpoints[i].dev, &setup, &len, &data) == -ENOTSUP);
+            assert(len == 37 && data == &sentinel && sentinel == 0xaa);
         }
-        struct usb_setup_packet setup = {.wValue = value, .wLength = 4};
-        uint8_t sentinel = 0xaa, *data = &sentinel;
-        int32_t len = 37;
-        assert(battery_get_report(&fake_device, &setup, &len, &data) == -ENOTSUP);
-        assert(len == 37 && data == &sentinel && sentinel == 0xaa);
     }
+    assert(total_sends() == 0);
+    if (INTERFACES == 1) { assert(peer_gets == 0); }
+}
+static void test_init_failure(int i, const char *kind) {
+    assert(i < INTERFACES);
+    struct endpoint *ep = &endpoints[i];
+    ep->binding_exists = strcmp(kind, "missing") != 0;
+    ep->ready = strcmp(kind, "unready") != 0;
+    ep->init_result = strcmp(kind, "error") == 0 ? -EIO : 0;
+    assert(usb_battery_init() == (ep->init_result ? -EIO : -ENODEV));
+    assert(battery_hid_dev == NULL && peer_hid_dev == NULL);
+    for (int j = 0; j < INTERFACES; j++) {
+        int registered = ep->init_result && j <= i ? 1 : 0;
+        assert(endpoints[j].registrations == registered && endpoints[j].initializations == registered);
+    }
+    event();
+    run_work();
+    assert(total_sends() == 0 && !pending && reschedules == 0 && schedules == 0);
 }
 static void test_gated(const char *mode) {
-    if (strcmp(mode, "missing") != 0) {
-        init_ok();
-    }
+    if (strcmp(mode, "missing") != 0) { init_ok(); }
     if (strcmp(mode, "disconnect") == 0) {
-        hid_ready = false;
-        usb_status = USB_DC_DISCONNECTED;
+        hid_ready = false; usb_status = USB_DC_DISCONNECTED;
     } else if (strcmp(mode, "not-ready") == 0) {
         hid_ready = false;
     } else if (strcmp(mode, "suspend") == 0) {
@@ -166,136 +239,164 @@ static void test_gated(const char *mode) {
     }
     int prior_reschedules = reschedules;
     run_work();
-    assert(sends == 0 && schedules == 0 && reschedules == prior_reschedules);
-    assert(!pending && wakeups == 0);
+    assert(total_sends() == 0 && schedules == 0 && reschedules == prior_reschedules && !pending);
+    event();
     if (battery_hid_dev) {
-        hid_ready = true;
-        usb_status = USB_DC_CONFIGURED;
-        event();
+        hid_ready = true; usb_status = USB_DC_CONFIGURED;
         assert(pending && pending_delay == 0);
         run_work();
-        assert(sends == 1 && schedules == 1 && last_schedule == 30000);
-    } else {
-        event();
-        assert(!pending && reschedules == 0);
-    }
+        assert(total_sends() == INTERFACES && schedules == 1 && last_schedule == 30000);
+    } else { assert(!pending && reschedules == 0); }
 }
-static void test_send(int error, bool inject_event) {
+static void test_send(int i, int error, bool inject_event) {
     init_ok();
-    send_result = error;
-    if (inject_event) {
-        during_write = event;
-    }
+    endpoints[i].send_result = error;
+    if (inject_event) { during_write = event; inject_interface = i; }
     run_work();
-    assert(sends == 1 && schedules == 1);
+    assert(total_sends() == INTERFACES && schedules == 1);
     assert(reschedules == (inject_event ? 2 : 1));
     assert(last_schedule == (error ? 1000 : 30000));
     assert(pending && pending_delay == (inject_event ? 0 : last_schedule));
-    assert(wakeups == 0);
+    const uint8_t *attempts[2] = {endpoints[0].last_attempt, endpoints[1].last_attempt};
     if (error) {
-        const uint8_t *retry_buffer = last_attempt;
-        send_result = 0;
+        endpoints[i].send_result = 0;
         during_write = NULL;
         run_work();
-        assert(sends == 2 && last_attempt == retry_buffer);
-        assert(last_schedule == 30000 && pending_delay == 30000);
+        assert(total_sends() == 2 * INTERFACES && last_schedule == 30000 && pending_delay == 30000);
+        for (int j = 0; j < INTERFACES; j++) {
+            /* Failure holds only its endpoint's inactive slot; success advances. */
+            assert((endpoints[j].last_attempt == attempts[j]) == (j == i));
+        }
     }
 }
-static void test_lifetime(void) {
+static void test_lifetime(int failed) {
     init_ok();
     run_work();
-    const uint8_t *first = outstanding;
-    send_result = -EAGAIN;
-    for (int i = 0; i < 3; i++) {
-        percentage = 65 + i;
+    const uint8_t *first[2] = {endpoints[0].outstanding, endpoints[1].outstanding};
+    endpoints[failed].send_result = -EAGAIN;
+    const uint8_t *inactive = NULL;
+    for (int n = 0; n < 4; n++) {
+        percentage = 65 + n; peer_state.level = 35 + n;
+        powered = n % 2; peer_state.charging = !powered;
         run_work();
-        assert(last_attempt != first && outstanding == first);
-        check_outstanding();
-        get_and_check(99, false, 4); /* EP0 must not touch interrupt DMA storage. */
+        assert(endpoints[failed].outstanding == first[failed]);
+        assert(endpoints[failed].last_attempt != first[failed]);
+        if (inactive) { assert(endpoints[failed].last_attempt == inactive); }
+        inactive = endpoints[failed].last_attempt;
+        read_all();
     }
-    const uint8_t *second = last_attempt;
-    hid_ready = false;
-    usb_status = USB_DC_DISCONNECTED;
-    run_work();
-    check_outstanding();
-    assert(!pending);
-    /* The real USB stack aborts the outstanding transfer on disconnect. */
-    outstanding = NULL;
-    hid_ready = true;
+    /* Both endpoints can fail independently without damaging either retained RAM. */
+    for (int i = 0; i < INTERFACES; i++) { endpoints[i].send_result = -EIO; }
+    percentage = 9; peer_state.level = 91;
+    run_work(); read_all();
+    assert(endpoints[failed].outstanding == first[failed]);
+    hid_ready = false; usb_status = USB_DC_DISCONNECTED;
+    int sends_before = total_sends();
+    run_work(); read_all();
+    assert(total_sends() == sends_before && !pending);
+    /* The real stack aborts pending transfers on disconnect, but it must not be
+     * necessary to reset the module's buffer-selection state to recover. */
+    for (int i = 0; i < INTERFACES; i++) {
+        endpoints[i].outstanding = NULL;
+        endpoints[i].send_result = 0;
+    }
+    hid_ready = true; usb_status = USB_DC_CONFIGURED;
+    percentage = 0; peer_state.level = 100;
+    event(); run_work(); read_all();
+    assert(endpoints[failed].outstanding == inactive);
+    /* A second failure/acceptance cycle must reuse, then advance, the right slot. */
+    endpoints[failed].send_result = -EIO;
+    percentage = 100; peer_state.level = 0;
+    run_work(); read_all();
+    assert(endpoints[failed].last_attempt == first[failed]);
+    assert(endpoints[failed].outstanding == inactive);
+    endpoints[failed].send_result = 0;
+    run_work(); read_all();
+    assert(endpoints[failed].outstanding == first[failed]);
+}
+static void test_transitions(void) {
+    assert(INTERFACES == 2);
+    init_ok();
+    peer_available = false; peer_state.level = 255; peer_state.charging = true;
+    run_work(); read_all();
+    assert(endpoints[0].sends == 1 && endpoints[1].sends == 0 && last_schedule == 30000);
+    peer_available = true; peer_state.level = 0; peer_state.charging = true;
+    percentage = 100; powered = false;
+    event(); run_work(); read_all();
+    assert(endpoints[1].sends == 1 && endpoints[1].outstanding[1] == 1);
+    assert(endpoints[0].outstanding[1] == 101 && endpoints[0].outstanding[2] == 0);
+    /* Model invalidation/staleness through the peer API's false return. */
+    peer_available = false; peer_state.level = 255; peer_state.charging = true;
+    endpoints[1].send_result = -EIO;
+    for (int n = 0; n < 3; n++) { event(); run_work(); read_all(); }
+    assert(endpoints[1].sends == 1 && last_schedule == 30000);
+    assert(endpoints[1].outstanding[1] == 1 && endpoints[1].outstanding[2] == 1);
+    endpoints[1].send_result = 0;
+    peer_available = true; peer_state.level = 100; peer_state.charging = false;
+    percentage = 0; powered = true;
+    event(); run_work(); read_all();
+    assert(endpoints[1].sends == 2 && endpoints[1].outstanding[1] == 101);
+    assert(endpoints[0].outstanding[1] == 1 && endpoints[0].outstanding[2] == 1);
+}
+static void test_suspend_pending(void) {
+    init_ok(); run_work();
+    int sends_before = total_sends();
+    usb_status = USB_DC_SUSPEND;
+    percentage = 0; peer_state.level = 100;
+    powered = false; peer_state.charging = true;
+    event(); run_work(); read_all();
+    assert(total_sends() == sends_before && !pending && schedules == 1);
+    /* Resume must recover with the previous transfers still protected until
+     * their own endpoints accept replacements. No wakeup request is allowed. */
     usb_status = USB_DC_CONFIGURED;
-    send_result = 0;
-    percentage = 22;
-    event();
-    run_work();
-    assert(last_attempt == second && outstanding == second);
-    assert(outstanding[1] == 22 && outstanding[2] == 0);
-    send_result = -EIO;
-    percentage = 37;
-    run_work();
-    assert(last_attempt == first && outstanding == second);
-    check_outstanding();
-    get_and_check(100, true, 4);
-    send_result = 0;
-    run_work();
-    assert(last_attempt == first && outstanding[1] == 100 && outstanding[2] == 1);
+    event(); run_work(); read_all();
+    assert(total_sends() == 2 * INTERFACES && pending_delay == 30000);
 }
 static void test_event(void) {
-    event();
-    assert(reschedules == 0 && !pending);
-    init_ok();
-    run_work();
-    assert(pending_delay == 30000);
-    event();
-    assert(pending_delay == 0 && reschedules == 2 && schedules == 1);
-    event();
-    assert(pending_delay == 0 && reschedules == 3);
-    assert(sends == 1); /* Listener queues work; never writes in event context. */
+    event(); assert(reschedules == 0 && !pending);
+    init_ok(); run_work(); assert(pending_delay == 30000);
+    event(); assert(pending_delay == 0 && reschedules == 2 && schedules == 1);
+    event(); assert(pending_delay == 0 && reschedules == 3);
+    assert(total_sends() == INTERFACES); /* Listener queues work; never writes. */
 }
 int main(int argc, char **argv) {
     assert(argc == 2);
     const char *test = argv[1];
-    if (strcmp(test, "init") == 0) {
+    int i = 0;
+    char kind[16];
+    if (strcmp(test, "init") == 0) { init_ok(); }
+    else if (sscanf(test, "init-%d-%15s", &i, kind) == 2) { test_init_failure(i, kind); }
+    else if (strcmp(test, "get-report") == 0) { test_get_report(); }
+    else if (strcmp(test, "reset-config") == 0) {
         init_ok();
-    } else if (strcmp(test, "init-missing") == 0 || strcmp(test, "init-unready") == 0 ||
-               strcmp(test, "init-error") == 0) {
-        binding_exists = strcmp(test, "init-missing") != 0;
-        device_ready = strcmp(test, "init-unready") != 0;
-        init_result = strcmp(test, "init-error") == 0 ? -EIO : 0;
-        assert(usb_battery_init() == (init_result ? -EIO : -ENODEV));
-        assert(battery_hid_dev == NULL && !pending && sends == 0);
-        assert(reschedules == 0 && schedules == 0);
-        assert(registrations == (init_result ? 1 : 0));
-        assert(initializations == registrations);
-        event();
+        peer_available = false;
         run_work();
-        assert(sends == 0 && !pending && reschedules == 0 && schedules == 0);
-    } else if (strcmp(test, "get-report") == 0) {
-        test_get_report();
-    } else if (strcmp(test, "missing") == 0 || strcmp(test, "disconnect") == 0 ||
-               strcmp(test, "suspend") == 0 || strcmp(test, "not-ready") == 0) {
-        test_gated(test);
-    } else if (strcmp(test, "send") == 0) {
-        test_send(0, false);
-    } else if (strcmp(test, "retry") == 0) {
-        test_send(-EAGAIN, false);
-    } else if (strcmp(test, "send-error") == 0) {
-        test_send(-EIO, false);
-    } else if (strcmp(test, "event-during-send") == 0) {
-        test_send(0, true);
-    } else if (strcmp(test, "event-during-retry") == 0) {
-        test_send(-EAGAIN, true);
-    } else if (strcmp(test, "lifetime") == 0) {
-        test_lifetime();
-    } else if (strcmp(test, "event") == 0) {
-        test_event();
-    } else if (strcmp(test, "descriptor") == 0) {
-        init_ok();
-        for (size_t i = 0; i < registered_desc_size; i++) {
-            printf("%02x", registered_desc[i]);
-        }
-        putchar('\n');
-    } else {
-        abort();
+        read_all();
+        assert(endpoints[0].sends == 1 && endpoints[1].sends == 0 && peer_gets == 0);
     }
+    else if (strcmp(test, "missing") == 0 || strcmp(test, "disconnect") == 0 ||
+             strcmp(test, "suspend") == 0 || strcmp(test, "not-ready") == 0) { test_gated(test); }
+    else if (strcmp(test, "send") == 0) { test_send(0, 0, false); }
+    else if (strcmp(test, "retry-central") == 0) { test_send(0, -EAGAIN, false); }
+    else if (strcmp(test, "retry-peer") == 0) { test_send(1, -EAGAIN, false); }
+    else if (strcmp(test, "error-central") == 0) { test_send(0, -EIO, false); }
+    else if (strcmp(test, "error-peer") == 0) { test_send(1, -EIO, false); }
+    else if (strcmp(test, "event-send-central") == 0) { test_send(0, 0, true); }
+    else if (strcmp(test, "event-send-peer") == 0) { test_send(1, 0, true); }
+    else if (strcmp(test, "event-retry-central") == 0) { test_send(0, -EAGAIN, true); }
+    else if (strcmp(test, "event-retry-peer") == 0) { test_send(1, -EAGAIN, true); }
+    else if (strcmp(test, "lifetime-central") == 0) { test_lifetime(0); }
+    else if (strcmp(test, "lifetime-peer") == 0) { test_lifetime(1); }
+    else if (strcmp(test, "transitions") == 0) { test_transitions(); }
+    else if (strcmp(test, "suspend-pending") == 0) { test_suspend_pending(); }
+    else if (strcmp(test, "event") == 0) { test_event(); }
+    else if (strcmp(test, "descriptor") == 0) {
+        init_ok();
+        for (int j = 0; j < INTERFACES; j++) {
+            for (size_t n = 0; n < endpoints[j].desc_size; n++) { printf("%02x", endpoints[j].desc[n]); }
+            putchar('\n');
+        }
+    } else { abort(); }
+    if (INTERFACES == 1) { assert(peer_gets == 0); }
     return 0;
 }

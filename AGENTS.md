@@ -66,17 +66,41 @@ no local toolchain here.
   shared, `.github/build-filters.yml` selects all three board workflows for changes
   to `src/charge_state.c`, `Kconfig` and `CMakeLists.txt`
 - `src/usb_battery.c` — shared central-only USB battery telemetry, gated by
-  `CONFIG_ZMK_USB_BATTERY_REPORTING` (independent of BLE). All three central configs
-  also set `CONFIG_USB_HID_DEVICE_COUNT=2`. Owns `HID_1`; never touch ZMK's `HID_0`
-  reports or call `usb_enable()` again. Registers at `CONFIG_ZMK_USB_HID_INIT_PRIORITY`
-  before ZMK enables USB. Report ID 1: percent, Charging bit, always-zero Consumer
-  Mute byte; this input capability prevents Linux discarding the battery interface.
-  Uses two persistent RAM buffers, advancing only when the driver accepts a write,
-  so pending DMA remains intact and aborted transfers cannot strand a semaphore.
-  Reports on USB/battery events and every 30 s; never wakes suspended USB.
-  `.github/build-filters.yml` selects all three board workflows for this file too.
-  Local regression tests: `python3 -m unittest discover -s tests/usb_battery -v`
-  (Python + GCC required).
+  `CONFIG_ZMK_USB_BATTERY_REPORTING`. Central readings are independent of BLE;
+  right readings need the internal BLE split. All three central configs set
+  `CONFIG_USB_HID_DEVICE_COUNT=3`: `HID_1` is left, `HID_2` is right. Never touch
+  ZMK's `HID_0` reports or call `usb_enable()` again. Registers at `CONFIG_ZMK_USB_HID_INIT_PRIORITY`
+  before ZMK enables USB. Report ID 1: percent + 1 (logical range 1–101), Charging
+  bit, always-zero Consumer Mute byte; this input capability prevents Linux
+  discarding the battery interface. Linux scales capacity back to percent, and
+  older kernels no longer discard a genuine empty-battery update as raw zero.
+  Uses two persistent RAM buffers per interface, advancing only when the driver
+  accepts a write, so pending DMA remains intact and aborted transfers cannot
+  strand a semaphore. Reports on USB/battery/peer events and every 30 s; never
+  wakes suspended USB. Vendor Feature 2 is `[2, available, percent, charging]`.
+  Missing/stale right data is withheld, not invented as zero/discharging. Linux
+  generic HID/UPower can still cache its last reading; strict consumers must use
+  the vendor validity flag. `.github/build-filters.yml` routes this source and the
+  split telemetry sources, headers, bindings and DT include to all three boards.
+  Local tests:
+  `python3 -B -m unittest discover -s tests/usb_battery -v` (Python + GCC required).
+- `src/split_battery.c` — private `zmk,input-split` reg 254, virtual source and
+  dedicated proxy callback; never attach a normal input listener/processors or
+  encode state in stock BAS battery bytes. Opt-in is the DT include
+  `config/telemetry/split_battery.dtsi` in all three shared keymaps. Both halves
+  must be flashed. Kconfig enables the module only with its DT source, so
+  `settings_reset` does not require telemetry nodes. It selects `ZMK_POINTING`
+  because upstream nests input-split under pointing; HID_0 may gain pointing
+  capabilities on previously non-pointing builds. Peripheral polls raw nRF VBUS
+  each second and sends changes/10-second heartbeats; central validates packets
+  and expires the cache after 35 seconds. Hidden behavior `sbat` sends a fresh
+  session challenge to the peripheral. Each private input packet echoes its full
+  token using both code and value fields; no ordinary MSC-code semantics apply.
+  Reject old-session packets even if delivered after reconnect. Keep `sbat` in
+  CMake and both firmware DTs; it is never key-bound. BLE host disconnects are not
+  split disconnects. Raw VBUS wiring remains hardware-unverified, Qi is not detected,
+  SOC is ZMK's cached value, and peripheral sleep/wake policy is not changed.
+  Local tests: `python3 -B -m unittest discover -s tests/split_battery -v`.
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)
@@ -119,9 +143,10 @@ no local toolchain here.
   matter how VBUS is wired. The "no VBUS sensing on the right half" note below may
   therefore be a false negative: the hardware bit (`POWER->USBREGSTATUS` via
   `nrf_power_usbregstatus_vbusdet_get()`) is readable without ZMK's USB stack and has
-  never actually been tested. Peripheral→central data has no user-extensible channel,
-  but the split transport's existing `BATTERY_EVENT` / `SENSOR_EVENT` / `INPUT_EVENT`
-  carriers can be repurposed without forking ZMK (see README limitations)
+  not been hardware-verified. The split battery module now uses a dedicated
+  `INPUT_EVENT` channel to carry that raw reading without forking ZMK or corrupting
+  standard battery percentages (see README limitations). Do not infer physical
+  VBUS wiring from whether the ZMK USB stack is enabled.
 - `SYS_INIT(fn, LEVEL, prio)` stringifies `prio` into the linker section name
   `.z_init_<LEVEL><prio>_0_`, so it accepts only a decimal literal or a symbol that *is*
   one — **arithmetic is not permitted** (`init.h` names
@@ -134,19 +159,22 @@ no local toolchain here.
   (`src/behaviors/behavior_layer_color.c`, never bound to a key): the central invokes it
   programmatically on layer/activity/peripheral-reconnect events, and
   `zmk_behavior_invoke_binding()` fans GLOBAL invocations out over the split transport
-  with param1 carrying the RGB24 color. Limitations: charging pulse can NOT be mirrored
-  (right-half USB is charge-only, no VBUS sensing); if upstream lands split layer-state
-  sync (zmk issue #3376) this relay can be replaced wholesale
+  with param1 carrying the RGB24 color. Charging pulse is not mirrored: this RGB
+  relay does not consume the separate raw-VBUS telemetry, whose hardware sensing
+  remains unverified. If upstream lands split layer-state sync (zmk issue #3376)
+  this relay can be replaced wholesale
 
 ## Hardware reference
 
 - Per half: AW20216S (SPI) driving 26 white backlight LEDs + 4 RGB LEDs (battery bar),
   CW2015 fuel gauge (I2C), no reset button, no charge-control interface found
-- Sleep: upstream `CONFIG_ZMK_SLEEP=y` keeps the device awake while USB/charging is
-  present (ZMK's `is_usb_power_present()` guard), so the host never deasserts VBUS and
-  overnight USB charging completes; it deep-sleeps only when fully unplugged. Qi
-  charging is NOT detected by ZMK (`zmk_usb_is_powered()` is the only power source
-  check) but still charges during deep sleep via the hardware receiver (not firmware-
-  detectable/indicatable; schematics are confidential)
+- Sleep: upstream `CONFIG_ZMK_SLEEP=y` keeps the central awake while USB/charging
+  is present (ZMK's `is_usb_power_present()` guard), so the host never deasserts
+  VBUS and overnight USB charging completes. This does NOT prove the same guard
+  works on a peripheral with no ZMK USB stack. Raw-VBUS telemetry does not change
+  sleep policy or add a wake source; a sleeping peripheral stops sending. Qi
+  charging is NOT detected by either path but still charges during deep sleep via
+  the hardware receiver (not firmware-detectable/indicatable; schematics are
+  confidential)
 - SWD pads: GND/IO/CLK (+3V on left), photo in `bootloader/pinout.png`
 - Backlight: `&bl` on SYSTEM layer; battery bar: `&bat`; profile/pair LEDs: see TODO.md

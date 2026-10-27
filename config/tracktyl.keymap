@@ -5,6 +5,7 @@
 #include <dt-bindings/zmk/mouse.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include "layouts/alphas.h"
+#include "telemetry/split_battery.dtsi"
 
 #define BASE_COLEMAK 0
 #define BASE_QWERTY 1

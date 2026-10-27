@@ -146,17 +146,43 @@ All three central halves also enable `src/usb_battery.c` with:
 
 ```conf
 CONFIG_ZMK_USB_BATTERY_REPORTING=y
-CONFIG_USB_HID_DEVICE_COUNT=2
+CONFIG_USB_HID_DEVICE_COUNT=3
 ```
 
-This adds **HID_1**, a separate USB HID interface reporting the central battery's
-percentage and inferred charging state. ZMK's keyboard/mouse/consumer reports
-remain on **HID_0**, and Studio's USB serial interface is unchanged. The USB option
-is independent of BLE and `CONFIG_ZMK_CHARGE_STATE_REPORTING`. Peripheral firmware
-does not enable it.
+This adds **HID_1 for the left/central battery** and **HID_2 for the right/peripheral
+battery**. Both expose their own percentage and inferred charging state through
+the central's USB data connection. Each has separate endpoint buffers and battery
+reports, so older Linux kernels do not merge the two batteries into one device.
+ZMK still owns **HID_0**, and Studio's USB serial interface remains separate. The
+central battery's USB reporting is independent of BLE and
+`CONFIG_ZMK_CHARGE_STATE_REPORTING`; the right battery needs the internal BLE split
+connection, not a Bluetooth connection to the host. Peripheral firmware does not
+enable the USB stack.
 
-The numbered Input report is four bytes: `01 percentage charging 00`. Battery
-Strength (usage page `0x06`, usage `0x20`) is the first payload byte, range 0–100;
+**Flash both halves from the updated build.** All three shared keymaps include
+`config/telemetry/split_battery.dtsi`. This opts both roles into
+`CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY`: a virtual input source and dedicated
+`zmk,input-split` channel at register 254. It has no normal input listener or input
+processors, so telemetry cannot generate key presses or pointer movement. Upstream
+requires `ZMK_POINTING` for this transport; enabling it can also add mouse
+capabilities to HID_0 on previously non-pointing builds. Existing trackball channels
+and the stock split battery/BLE BAS values are not repurposed. A hidden `sbat`
+behavior carries a new central challenge on each split connection; the peripheral
+must echo that session token in every telemetry packet. Old queued packets cannot
+restore availability after reconnect. The challenge is retried while waiting for
+telemetry, including while split discovery/subscription is still starting.
+
+`src/split_battery.c` polls the peripheral's raw nRF52840 VBUS detector once a
+second. It relays changed state and a ten-second heartbeat with the cached ZMK
+battery percentage. Unlike `zmk_usb_is_powered()`, this raw detector does not need
+the peripheral USB stack. **VBUS wiring on these boards is still unverified**:
+test the right cable both connected and disconnected before treating the flag as
+reliable. No charger-current/termination or Qi detection is available.
+
+The numbered Input report is four bytes: `01 (percentage+1) charging 00`. Battery
+Strength (usage page `0x06`, usage `0x20`) is the first payload byte, logical range
+1–101. Linux scales this exactly back to 0–100%, avoiding older kernels' rejection
+of raw-zero interrupt capacity updates. The vendor Feature below uses plain percent;
 Charging (page `0x85`, usage `0x44`) occupies bit 0 of the next byte. The final byte
 is an always-released Consumer Mute bit with padding. This gives Linux an ordinary
 input capability so it does not discard a battery-only interface; it never sends
@@ -165,18 +191,36 @@ and USB power state. Interrupt reports run on battery/USB events and every 30
 seconds while configured, with one-second retries on write errors. Suspended USB
 is not woken for telemetry; resume/reconnect restarts reports.
 
+Both interfaces also expose vendor Feature report **2** as
+`02 available percentage charging`. `available=0` means the remaining fields are
+not measurements. Before receiving a right sample, after its split disconnect,
+or after 35 seconds without telemetry, the firmware withholds right Input reports
+and fails right Input `GET_REPORT` with `-ENODATA`; it never fabricates a 0% or
+"discharging" reading for missing data. Reconnection alone does not restore
+validity. A new sample is required. Percentage is ZMK's cached gauge reading, not
+a guarantee of a fresh sensor conversion; ZMK starts at 0% before its first sample
+and can pause gauge updates during idle.
+
 On **Linux 6.3+**, generic HID supports these usages as a device-scoped
 `power_supply` battery with percentage and Charging/Discharging status. UPower can
 consume that battery without a custom GATT reader. Linux **6.17+** also notifies
-charging-state changes immediately; older kernels can need polling. On older
-kernels even unsolicited 0% updates can remain cached until a capacity query.
+charging-state changes immediately; older kernels can need polling. The offset
+capacity encoding also makes a genuine empty battery visible on older kernels.
 Interrupt delivery requires an opened input/hidraw device, normally supplied by
 the desktop input stack; headless hosts may need a reader holding it open. macOS
 and Windows battery UI support is not established. This is not a UPS interface.
 
+**Generic Linux HID/UPower can retain the last right-half reading after a split
+disconnect.** Suppressing reports cannot invalidate that host cache, and the two
+USB battery interfaces remain enumerated while the left USB cable is connected.
+Native desktop entries are therefore not proof that the right half is still
+connected or charging. Consumers needing strict freshness must read Feature 2's
+validity; native UPower does not consume that vendor field. Both entries may use
+the same keyboard product name; distinguish them by their USB/HID interface path.
+
 The existing `host/waybar-zmk-charging.sh` remains **BLE-only**. For USB, use the
-kernel battery/UPower path. After building and flashing the central firmware,
-verify with Bluetooth disconnected:
+kernel battery/UPower path. After building and flashing **both halves**, keep the
+internal split connected and disable only the host's Bluetooth connection:
 
 ```sh
 for battery in /sys/class/power_supply/hid-*-battery; do
@@ -187,49 +231,52 @@ done
 upower --enumerate
 ```
 
-Find the keyboard's newly added device battery, then inspect its UPower path with
-`upower --show-info <path>`. Check typing, mouse reports and Studio still work;
-check suspend/resume and unplug/replug, including with a different percentage.
-The USB battery **disappears on unplug**: it cannot report discharging over a
-removed cable. BLE reporting is still needed for wireless status. At 100%, UPower
-may display FullyCharged even though the firmware's VBUS-based flag remains set.
+Find both keyboard device batteries, then inspect their UPower paths with
+`upower --show-info <path>`. The left should report wired power while its USB data
+cable is connected. Connect/disconnect the **right** charging cable independently:
+only the right charging flag should change, with its own percentage. Check typing,
+mouse reports and Studio still work. Check suspend/resume, unplug/replug, and split
+disconnect/reconnect. Inspect Feature 2 when testing missing/stale right data, not
+just a cached desktop value.
+
+Both USB batteries **disappear when the left data cable is unplugged**; they cannot
+report over a removed USB link. BLE reporting is still needed for wireless host
+status, and its existing charging characteristic still describes the central only.
+At 100%, UPower may display FullyCharged even while a VBUS-based flag remains set.
+A sleeping peripheral stops its telemetry; the cache then expires. Polling raw VBUS
+does not itself add peripheral sleep prevention or a new wake source.
 
 Local regression tests compile the actual module against API stubs and parse its
 HID descriptor (no firmware toolchain or external Python packages needed):
 
 ```sh
-python3 -m unittest discover -s tests/usb_battery -v
+python3 -B -m unittest discover -s tests/usb_battery -v
+python3 -B -m unittest discover -s tests/split_battery -v
 # Or, when Python/GCC are not installed:
-nix shell nixpkgs#python3 nixpkgs#gcc --command python3 -m unittest discover -s tests/usb_battery -v
+nix shell nixpkgs#python3 nixpkgs#gcc --command python3 -B -m unittest discover -s tests/usb_battery -v
 ```
 
-See `tests/usb_battery/README.md` for coverage, limitations and FHS/Nix environment
-troubleshooting. These tests do not replace a Zephyr firmware build or USB
-enumeration on hardware.
+See `tests/usb_battery/README.md` and `tests/split_battery/README.md` for coverage,
+limitations and FHS/Nix environment troubleshooting. These tests do not replace a
+Zephyr firmware build or USB enumeration on hardware.
 
 ### Limitations
 
-- **Central (left) half only** — not a hard limit, just not built. In practice the
-  central is the half you plug the cable into. Doing the peripheral too is possible
-  without forking ZMK, via two non-obvious steps: read VBUS straight off
-  `POWER->USBREGSTATUS` with `nrf_power_usbregstatus_vbusdet_get()` (ZMK's `ZMK_USB`
-  is `depends on (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)` so the USB stack can never
-  come up on a peripheral — but the hardware VBUS bit does not need it), then smuggle
-  the flag over one of the split transport's existing peripheral→central carriers
-  (`BATTERY_EVENT` → `zmk_peripheral_battery_state_changed` is the least intrusive;
-  `SENSOR_EVENT` and `INPUT_EVENT` also work) and republish it on a custom GATT
-  characteristic, since Zephyr's BAS has only one BLS instance. Open question on
-  Hatsu: whether VBUS physically reaches the right half's nRF at all — `AGENTS.md`
-  says no, but that may be a false negative from testing through `ZMK_USB`.
+- **The BLE charging characteristic remains central-only.** USB additionally exposes
+  one peripheral via the private input-split relay. More than one peripheral is
+  deliberately rejected at compile time instead of merging their states.
+- **Right-half VBUS sensing is not hardware-verified.** Reading the nRF POWER
+  register bypasses ZMK's central-only USB dependency, but it cannot establish that
+  a particular board physically routes its charging connector to that detector.
 - **"Charging" means VBUS present.** No board here has a charger-status interface, so
   a full battery left plugged in still reads as charging. Same signal the on-keyboard
   indicator uses.
 - **Qi charging is not firmware-detectable.** The BLE wireless-power-source field
   reports `UNKNOWN`, not "not connected". The USB Charging bit only reflects VBUS;
   it cannot encode a separate Qi/unknown state.
-- **USB reports require a data connection**, not a charge-only cable. USB reports
-  contain only the central battery; the separate BLE signal remains available
-  without a USB host connection.
+- **USB reports require a central data connection**, not a charge-only cable. The
+  right half additionally requires a live internal split link. The separate BLE
+  central signal remains available without a USB host connection.
 
 ## Build pipelines
 
@@ -237,8 +284,9 @@ enumeration on hardware.
 It checks `.github/build-filters.yml` and calls each affected board workflow once:
 
 - Shared layouts, behaviors, combos, manifest, charge-state sources
-  (`src/charge_state.c`, `src/usb_battery.c`), module metadata, build-system files,
-  or `.github/**` changes → all three boards, including Hatsu.
+  (`src/charge_state.c`, `src/usb_battery.c`, `src/split_battery.c`), split telemetry
+  behavior, headers, bindings and `config/telemetry/**`, module metadata,
+  build-system files, or `.github/**` changes → all three boards, including Hatsu.
 - Board-only changes → only affected boards, even when several boards change together.
 - Shared plus board-only changes → all three boards, with no duplicate board jobs.
 - Unrelated changes → path check only; no firmware builds.
