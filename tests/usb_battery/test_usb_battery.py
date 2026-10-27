@@ -127,11 +127,14 @@ class UsbBatteryTests(unittest.TestCase):
             "-I", str(ROOT),
             str(HERE / "harness.c"),
         ]
+        cls.compile_command = command
         for variant, macros in {
             "split": ["-DCONFIG_USB_HID_DEVICE_COUNT=3", "-DCONFIG_ZMK_SPLIT_BATTERY_TELEMETRY=1"],
             # Kconfig n means undefined, NOT a macro defined to zero: production uses defined().
-            "single": ["-DCONFIG_USB_HID_DEVICE_COUNT=2"],
-            # Reset keymaps omit the telemetry DT nodes, while central config keeps HID count 3.
+            # One battery does not collide, so legacy builds may keep their USB serial.
+            "single": ["-DCONFIG_USB_HID_DEVICE_COUNT=2", '-DCONFIG_USB_DEVICE_SN="single-battery"'],
+            # Reset disables telemetry with BLE off but may retain its DT nodes.
+            # Central config keeps HID count 3; source-device linkage is tested separately.
             "reset": ["-DCONFIG_USB_HID_DEVICE_COUNT=3"],
         }.items():
             executable = cls.build / f"usb_battery_{variant}"
@@ -152,6 +155,18 @@ class UsbBatteryTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, f"{variant}/{name}:\n{result.stdout}{result.stderr}")
         return result.stdout
+
+    def test_two_batteries_reject_a_shared_nonempty_usb_serial(self):
+        result = subprocess.run(
+            self.compile_command + [
+                "-DCONFIG_USB_HID_DEVICE_COUNT=3",
+                '-DCONFIG_USB_DEVICE_SN="shared-serial"',
+                "-o", str(self.build / "invalid_shared_serial"),
+            ], capture_output=True, text=True, timeout=60,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("static assertion failed", result.stderr)
+        self.assertIn("CONFIG_USB_DEVICE_SN", result.stderr)
 
     def test_count_three_without_telemetry_withholds_peer_and_keeps_central(self):
         self.run_case("reset-config", variant="reset")

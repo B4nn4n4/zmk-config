@@ -68,8 +68,14 @@ no local toolchain here.
 - `src/usb_battery.c` — shared central-only USB battery telemetry, gated by
   `CONFIG_ZMK_USB_BATTERY_REPORTING`. Central readings are independent of BLE;
   right readings need the internal BLE split. All three central configs set
-  `CONFIG_USB_HID_DEVICE_COUNT=3`: `HID_1` is left, `HID_2` is right. Never touch
-  ZMK's `HID_0` reports or call `usb_enable()` again. Registers at `CONFIG_ZMK_USB_HID_INIT_PRIORITY`
+  `CONFIG_USB_HID_DEVICE_COUNT=3`: `HID_1` is left, `HID_2` is right. All three
+  centrals also set `CONFIG_USB_DEVICE_SN=""`: Linux 6.19 otherwise names both
+  batteries from their shared USB serial and rejects the second with `-17`.
+  Empty USB serial makes Linux use distinct HID device names. Keep the build
+  assertion requiring it for count 3; report IDs alone do not fix that kernel.
+  Application USB serial/by-id paths and battery-history identity may change;
+  BLE identity/bonds and bootloader identity do not. Studio discovery needs a
+  hardware check. Never touch ZMK's `HID_0` reports or call `usb_enable()` again. Registers at `CONFIG_ZMK_USB_HID_INIT_PRIORITY`
   before ZMK enables USB. Report ID 1: percent + 1 (logical range 1–101), Charging
   bit, always-zero Consumer Mute byte; this input capability prevents Linux
   discarding the battery interface. Linux scales capacity back to percent, and

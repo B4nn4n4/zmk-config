@@ -84,8 +84,11 @@ config ZMK_USB_BATTERY_REPORTING
     depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
     help
       HID_1 reports the central battery; HID_2 reports the peripheral when split
-      battery telemetry is enabled. Set USB_HID_DEVICE_COUNT=3 for both halves,
-      or 2 for central-only reporting. Linux generic HID exposes device batteries;
+      battery telemetry is enabled. Set USB_HID_DEVICE_COUNT=3 for both halves
+      and USB_DEVICE_SN="" to prevent serial-derived battery-name collisions on
+      Linux 6.19. This changes serial-based USB paths and battery history identity,
+      not BLE identity. Set the count to 2 for central-only reporting, which can
+      retain its USB serial. Linux generic HID exposes device batteries;
       Linux 6.3+ also supports their Charging usage. Charging is inferred from
       each half's USB power, not charger current. Unknown/stale peer samples are
       withheld; generic host drivers can still cache an earlier reading. Feature
