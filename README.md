@@ -147,6 +147,7 @@ All three central halves also enable `src/usb_battery.c` with:
 ```conf
 CONFIG_ZMK_USB_BATTERY_REPORTING=y
 CONFIG_USB_HID_DEVICE_COUNT=3
+CONFIG_USB_DEVICE_SN=""
 ```
 
 This adds **HID_1 for the left/central battery** and **HID_2 for the right/peripheral
@@ -159,7 +160,24 @@ central battery's USB reporting is independent of BLE and
 connection, not a Bluetooth connection to the host. Peripheral firmware does not
 enable the USB stack.
 
-**Flash both halves from the updated build.** All three shared keymaps include
+**The application USB serial string is intentionally empty on these centrals.**
+Linux 6.19 derives a HID battery's name from the USB serial when present. All
+interfaces share that serial, so the second battery otherwise fails registration
+with `-17` (`EEXIST`). With an empty serial, Linux falls back to the distinct HID
+device names. Changing report IDs alone does not fix that kernel's naming rule.
+A compile-time guard rejects a nonempty USB serial with three HID instances.
+
+This changes the USB identity of all application interfaces, including Studio and
+logging CDC ports. Serial-based udev rules and `/dev/serial/by-id` paths may change
+or disappear. HID battery names and UPower history identifiers can change on
+reconnect. Keyboard/product names remain unchanged, so both battery entries may
+still have the same human-readable name. Test Studio discovery after reflashing.
+BLE identity/bonds and the separate UF2 bootloader's USB identity are not changed.
+For the serial-string fix alone, only the central needs reflashing if the
+peripheral already runs the split-telemetry firmware.
+
+**For the initial split-telemetry installation, flash both halves.** All three
+shared keymaps include
 `config/telemetry/split_battery.dtsi`. This opts both roles into
 `CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY`: a virtual input source and dedicated
 `zmk,input-split` channel at register 254. It has no normal input listener or input
@@ -222,7 +240,8 @@ USB battery interfaces remain enumerated while the left USB cable is connected.
 Native desktop entries are therefore not proof that the right half is still
 connected or charging. Consumers needing strict freshness must read Feature 2's
 validity; native UPower does not consume that vendor field. Both entries may use
-the same keyboard product name; distinguish them by their USB/HID interface path.
+the same keyboard product name; distinguish them by their USB/HID interface path,
+not by a persistent USB serial.
 
 The existing `host/waybar-zmk-charging.sh` remains **BLE-only**. For USB, use the
 kernel battery/UPower path. After building and flashing **both halves**, keep the
@@ -237,13 +256,18 @@ done
 upower --enumerate
 ```
 
-Find both keyboard device batteries, then inspect their UPower paths with
-`upower --show-info <path>`. The left should report wired power while its USB data
+Find two distinct keyboard device batteries, then inspect their UPower paths with
+`upower --show-info <path>`. Check kernel logs for absence of duplicate-name/`-17`
+registration errors. Both HID interfaces enumerating is not sufficient proof. The left should report wired power while its USB data
 cable is connected. Connect/disconnect the **right** charging cable independently:
 only the right charging flag should change, with its own percentage. Check typing,
 mouse reports and Studio still work. Check suspend/resume, unplug/replug, and split
 disconnect/reconnect. Inspect Feature 2 when testing missing/stale right data, not
-just a cached desktop value.
+just a cached desktop value. Feature reads need permitted access to the selected
+hidraw devices; if that access is denied, underlying telemetry remains unverified.
+The serial-string change fixes registration, not a separate 0%/unknown reading.
+Compare plain-percent Feature 2 values with kernel/UPower values before changing
+gauge sampling or interpreting 0% as a measured empty battery.
 
 Both USB batteries **disappear when the left data cable is unplugged**; they cannot
 report over a removed USB link. BLE reporting is still needed for wireless host

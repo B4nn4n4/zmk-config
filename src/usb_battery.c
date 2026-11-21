@@ -105,6 +105,14 @@ BUILD_ASSERT(CONFIG_USB_HID_DEVICE_COUNT >= 2 && CONFIG_USB_HID_DEVICE_COUNT <= 
 #if defined(CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY)
 BUILD_ASSERT(CONFIG_USB_HID_DEVICE_COUNT == 3, "Split battery telemetry needs HID_2");
 #endif
+#if CONFIG_USB_HID_DEVICE_COUNT == 3
+/* Linux 6.19 uses HID_UNIQ (the shared USB serial) as the power_supply name.
+ * Without a serial it falls back to each distinct HID device path. Merely using
+ * two interfaces or changing their report IDs cannot prevent that name collision.
+ */
+BUILD_ASSERT(sizeof(CONFIG_USB_DEVICE_SN) == 1,
+             "Two USB batteries require USB_DEVICE_SN=\"\" to avoid duplicate Linux battery names");
+#endif
 BUILD_ASSERT(CONFIG_HID_INTERRUPT_EP_MPS >= sizeof(struct usb_battery_report));
 BUILD_ASSERT(CONFIG_ZMK_USB_HID_INIT_PRIORITY < CONFIG_ZMK_USB_INIT_PRIORITY,
              "Register USB battery before ZMK enables USB");

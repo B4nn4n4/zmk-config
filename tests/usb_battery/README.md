@@ -34,7 +34,9 @@ The main binary uses `CONFIG_USB_HID_DEVICE_COUNT=3` and
 `CONFIG_ZMK_SPLIT_BATTERY_TELEMETRY=1`. A second binary uses count two with telemetry
 undefined (Kconfig `n`, not a macro defined as zero). It runs the single-interface
 initialization, error, report, gating, retry, buffer-lifetime, and scheduling cases
-and checks the descriptor. The fake peer getter must never be called in that binary.
+and checks the descriptor. It keeps a nonempty USB serial to verify that the
+single-battery configuration remains supported. The fake peer getter must never
+be called in that binary.
 A third binary keeps count three but omits runtime telemetry, matching a central
 `settings_reset` build with BLE disabled. Reset builds can retain the telemetry DT
 nodes; the separate split tests cover that virtual-device linkage. It still
@@ -71,6 +73,19 @@ usages, collections, and independent bit offsets/counts per `(report type, ID)`.
 Input 1 and Feature 2 each have a three-byte payload plus report ID. Vendor Feature
 metadata must not introduce a second generic Battery Strength usage. A synthetic
 parser case reuses one ID across Input and Feature to prove offset isolation.
+
+Identity regressions:
+
+- Actual source compilation rejects a nonempty shared USB serial with three HID
+  instances, before two interfaces can produce colliding native battery names.
+- `test_usb_identity.py` checks explicit empty-serial settings on all three
+  centrals. Its Linux 6.19 naming model reproduces the shared-serial collision,
+  then checks distinct HID-device-name fallback and the loss of stable history
+  identifiers on re-enumeration. This is a source-based model, not kernel execution.
+- These tests do not execute Zephyr's USB string-descriptor generator, perform a
+  complete firmware build, or prove Studio/USB host discovery without a serial.
+  Hardware verification still needs two native battery entries, no `-17` error,
+  and permitted raw Feature 2 reads. A 0%/unknown value is a separate diagnostic.
 
 Limits: stubs model serialized work execution, pending-work schedule/reschedule
 semantics, and disconnect transfer abortion. Peer staleness and invalidation are
